@@ -65,7 +65,7 @@ class UserController {
         return response.status(200).json({
             message: "Usuário deletado com sucesso",
         })
-    };
+    }
 }
 
 export default new UserController()
