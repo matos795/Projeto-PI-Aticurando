@@ -1,6 +1,6 @@
 export interface ICurso {
     name: string;
-    descripton?: string; 
+    description?: string; 
     active: boolean;
     createAt?: string;
     updateAt?: string;
