@@ -1,5 +1,6 @@
 import { Router } from "express";
 import userRoutes from "./modules/user/user.routes.js";
+import cursoRoutes from "./modules/curso/curso.routes.js";
 
 const routes = Router();
 
@@ -10,5 +11,6 @@ routes.get("/teste", (request, response) => {
 });
 
 routes.use("/users", userRoutes);
+routes.use("/curso", cursoRoutes);
 
 export default routes;
