@@ -13,6 +13,9 @@ class CursoService{
 
         return curso;
     }
+    public async findAll(){
+        return await Curso.find();
+    }
 }
 
 export default new CursoService();

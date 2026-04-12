@@ -14,6 +14,10 @@ class CursoController{
 
         return response.status(201).json(curso);
     };
+    public async findAll (request: Request, response: Response): Promise<Response>{
+        const cursos = await cursoService.findAll();
+        return response.status(200).json(cursos)
+    }
 }
 
 export default new CursoController();
