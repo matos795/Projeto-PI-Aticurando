@@ -5,6 +5,6 @@ const cursoRoutes = Router();
 
 cursoRoutes.post("/", cursoController.create);
 cursoRoutes.get("/", cursoController.findAll);
-
+cursoRoutes.get("/:id", cursoController.findById);
 
 export default cursoRoutes;

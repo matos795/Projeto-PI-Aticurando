@@ -16,6 +16,9 @@ class CursoService{
     public async findAll(){
         return await Curso.find();
     }
+    public async findById(id: String){
+        return await Curso.findById(id)
+    }
 }
 
 export default new CursoService();
