@@ -1,5 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 import type {ICurso} from "./curso.types.js";
+import { materiaSchema } from "../materia/materia.model.js";
 
 const cursoSchema = new Schema<ICurso>(
     {
@@ -17,6 +18,12 @@ const cursoSchema = new Schema<ICurso>(
             type: Boolean,
             default: true
         },
+        materias: [
+            {
+            type: materiaSchema,
+            default: true
+        }
+        ]
     },
     {
         timestamps: true,

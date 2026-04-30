@@ -1,7 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 import type { IMateria } from "./materia.types.js";
 
-const materiaSchema = new Schema<IMateria>(
+export const materiaSchema = new Schema<IMateria>(
     {
         name: {
             type: String,
