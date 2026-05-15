@@ -3,12 +3,13 @@ import cursoService from "./curso.service.js";
 
 class CursoController {
     public async create(request: Request, response: Response): Promise<Response> {
-        const { name, description, active } = request.body ?? {};
+        const { name, description, active, materias } = request.body ?? {};
 
         const curso = await cursoService.create({
             name,
             description,
             active,
+            materias,
         });
 
         return response.status(201).json(curso);
@@ -36,7 +37,7 @@ class CursoController {
 
     public async update(request: Request, response: Response): Promise<Response> {
         const { id } = request.params;
-        const { name, description, active } = request.body;
+        const { name, description, active, materias } = request.body;
 
         if (!id || typeof id !== "string") {
             return response.status(400).json({
@@ -48,6 +49,7 @@ class CursoController {
             name,
             description,
             active,
+            materias,
         });
 
         return response.status(200).json(curso);

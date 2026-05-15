@@ -1,16 +1,12 @@
 import { Router } from "express";
 import userRoutes from "./modules/user/user.routes.js";
 import cursoRoutes from "./modules/curso/curso.routes.js";
+import materiaRoutes from "./modules/materia/materia.routes.js";
 
 const routes = Router();
 
-routes.get("/teste", (request, response) => {
-    return response.status(200).json({
-        message: "Endpoint de teste funcionando",
-    });
-});
-
 routes.use("/users", userRoutes);
 routes.use("/curso", cursoRoutes);
+routes.use("/materia", materiaRoutes);
 
 export default routes;

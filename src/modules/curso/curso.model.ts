@@ -1,6 +1,19 @@
 import mongoose, {Schema} from "mongoose";
 import type {ICurso} from "./curso.types.js";
 
+const materiaSchema = new Schema(
+    {
+        materia: {
+            type: Schema.Types.ObjectId,
+            ref: "Materia",
+            required: true,
+        }
+    },
+    {
+        _id: false,
+    }
+);
+
 const cursoSchema = new Schema<ICurso>(
     {
         name: {
@@ -16,6 +29,10 @@ const cursoSchema = new Schema<ICurso>(
         active: {
             type: Boolean,
             default: true
+        },
+        materias: {
+            type: [materiaSchema],
+            default: [],
         },
     },
     {
