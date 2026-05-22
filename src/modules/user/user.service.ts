@@ -1,14 +1,13 @@
-import { error } from "node:console";
 import User from "./user.model.js";
 import {
     Papel_usuario,
-    type ICreateUserDTO,
     type IUpdateUserDTO
 } from "./user.types.js";
 import bcrypt from "bcryptjs";
+import type { IRegisterDTO } from "../auth/auth.types.js";
 
 class userService {
-    public async create(data: ICreateUserDTO){
+    public async create(data: IRegisterDTO){
         const emailExiste = await User.findOne({email:data.email});
 
         if (emailExiste){
