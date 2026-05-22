@@ -1,17 +1,43 @@
+import { error } from "node:console";
 import User from "./user.model.js";
-import type {
-    ICreateUserDTO,
-    IUpdateUserDTO
+import {
+    Papel_usuario,
+    type ICreateUserDTO,
+    type IUpdateUserDTO
 } from "./user.types.js";
+import bcrypt from "bcryptjs";
 
 class userService {
     public async create(data: ICreateUserDTO){
+        const emailExiste = await User.findOne({email:data.email});
+
+        if (emailExiste){
+            throw new Error("E-mail já cadastrado, insira um e-mail válido ou faça login")
+        }
+
+        const cpfExiste = await User.findOne({cpf: data.cpf});
+
+        if (cpfExiste){
+            throw new Error("CPF já cadastrado, insira um CPF válido ou faça login")
+        }
+
+        const senhaHash = await bcrypt.hash(data.senha,10)
+
         const user = await User.create({
         name: data.name,
-        cpf: data.cpf
+        cpf: data.cpf,
+        email: data.email,
+        senha: senhaHash,
+        papelUsuario: Papel_usuario.ALUNO,
+        active: true
         })
 
-        return user;
+        return {id: user._id, 
+                name: user.name,
+                cpf: user.cpf,
+                email: user.email,
+                papel_usuario: user.papelUsuario,
+                active: user.active};
     }
 
     public async findAll(){
