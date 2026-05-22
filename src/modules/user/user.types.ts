@@ -1,6 +1,9 @@
 import type {Types} from "mongoose"
 
-export enum Papel_usuario {"ADM", "ALUNO", "PROFESSOR"}
+export enum Papel_usuario {
+    ADM = "ADM",
+    ALUNO = "ALUNO",
+    PROFESSOR = "PROFESSOR"}
 
 export interface IUser {
     name: string;
