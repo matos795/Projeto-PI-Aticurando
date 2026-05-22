@@ -3,11 +3,13 @@ import userService from "./user.service.js";
 
 class UserController {
     public async create(request: Request, response: Response): Promise<Response>{
-        const {name, cpf} = request.body ?? {};
+        const {name, cpf, email, senha} = request.body ?? {};
 
         const user = await userService.create({
             name,
-            cpf
+            cpf,
+            email,
+            senha
         });
 
         return response.status(201).json(user);
