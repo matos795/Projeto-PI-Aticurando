@@ -1,6 +1,9 @@
 import type { Types } from "mongoose";
 
-export enum Turno{"MANHA", "TARDE", "NOITE"} ;
+export enum Turno{
+    MANHA = "MANHA",
+    TARDE = "TARDE",
+    NOITE = "NOITE"} ;
 
 export interface ITurma {
     capacidade: number;

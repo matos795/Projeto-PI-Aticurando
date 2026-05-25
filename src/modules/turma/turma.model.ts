@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-import type { ITurma } from "./turma.types.js";
+import { Turno, type ITurma } from "./turma.types.js";
 
 const turmaSchema = new Schema<ITurma>(
     {
@@ -12,7 +12,7 @@ const turmaSchema = new Schema<ITurma>(
         turno: {
             type: String,
             required: true,
-            enum: ["MANHA", "TARDE", "NOITE"],
+            enum: Object.values(Turno),
         },
         dataInicio: {
             type: Date,
