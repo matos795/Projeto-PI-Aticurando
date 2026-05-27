@@ -9,7 +9,7 @@ export interface IUser {
     name: string;
     cpf: number;
     email: string;
-    senha: string;
+    senhaHash: string;
     papelUsuario: Papel_usuario;
     active: boolean;
     createAt?: string;

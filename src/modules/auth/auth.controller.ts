@@ -17,7 +17,7 @@ class AuthController {
 
     public async login(request: Request, response: Response): Promise<Response> {
         const { email, senha } = request.body ?? {};
-
+        console.log("Login attempt:", { email, senha });
         const result = await authService.login({
             email,
             senha,

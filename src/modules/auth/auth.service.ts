@@ -1,9 +1,8 @@
 import bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
 import type { ILoginDTO, IRegisterDTO } from "./auth.types.js";
-
 
 class AuthService {
 
@@ -24,19 +23,25 @@ class AuthService {
 
         const senhaValida = await bcrypt.compare(
             data.senha,
-            user.get("senhaHash") as string,
+            user.senhaHash,
         );
 
         if (!senhaValida) {
             throw new Error("E-mail ou senha inválidos");
         }
 
+        const jwtSecret = process.env.JWT_SECRET;
+
+        if (!jwtSecret) {
+            throw new Error("JWT_SECRET não configurado no .env");
+        }
+
         const token = jwt.sign(
             {
                 id: user._id,
-                role: user.papelUsuario,
+                papelUsuario: user.papelUsuario,
             },
-            process.env.JWT_SECRET as jwt.Secret,
+            jwtSecret,
             {
                 expiresIn: process.env.JWT_EXPIRES_IN ?? "1d",
             } as jwt.SignOptions,

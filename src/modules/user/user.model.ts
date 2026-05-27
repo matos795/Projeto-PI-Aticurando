@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { Papel_usuario, type IUser } from "./user.types.js";
 
 
@@ -20,10 +20,10 @@ const userSchema = new Schema<IUser>({
         lowercase: true,
         trim: true
     },
-    senha: {
+    senhaHash: {
         type: String,
         required: true,
-        select: false
+        select: false,
     },
     papelUsuario: {
         type: String,
@@ -35,12 +35,10 @@ const userSchema = new Schema<IUser>({
         type: Boolean,
         default: true
     }
-
-
 },
-{
-    timestamps: true,
-},
+    {
+        timestamps: true,
+    },
 );
 
 const User = mongoose.model<IUser>("User", userSchema);
