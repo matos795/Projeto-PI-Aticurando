@@ -58,6 +58,23 @@ class AuthService {
             },
         };
     }
+
+    public async getMe(userId: string) {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error("Usuário não encontrado");
+        }
+
+        return {
+            id: user._id,
+            name: user.name,
+            cpf: user.cpf,
+            email: user.email,
+            papelUsuario: user.papelUsuario,
+            active: user.active
+        };
+    }
 }
 
 export default new AuthService();

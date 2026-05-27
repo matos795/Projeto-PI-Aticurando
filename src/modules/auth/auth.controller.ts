@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import authService from "./auth.service.js";
+import type { RequestAutenticado } from "../../types/request.types.js";
 
 class AuthController {
     public async register(request: Request, response: Response): Promise<Response> {
@@ -24,6 +25,23 @@ class AuthController {
         });
 
         return response.status(200).json(result);
+    }
+
+    public async getMe(
+        request: RequestAutenticado,
+        response: Response,
+    ): Promise<Response> {
+        const userId = request.user?.id;
+
+        if (!userId) {
+            return response.status(401).json({
+                message: "Usuário não autenticado",
+            });
+        }
+
+        const user = await authService.getMe(userId);
+
+        return response.status(200).json(user);
     }
 }
 
