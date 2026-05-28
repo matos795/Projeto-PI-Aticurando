@@ -51,4 +51,74 @@ class MatriculaService {
             },
         ]);
     }
+
+    public async findAll(){
+        return await Matricula.find().populate([
+            {
+                path: "user",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    }
+
+    public async findById(id: string)
+    {
+        return await Matricula.findById(id).populate([
+            {
+                path: "usuario",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    };
+
+     public async update(id: string,data: IUpdateMatriculaDTO) {
+        const updateData: any = {};
+
+        if (data.frequencia !== undefined) {
+            updateData.frequencia = data.frequencia;
+        }
+
+        if (data.status !== undefined) {
+            updateData.status = data.status;
+        }
+
+        if (data.motivoCancelamento !== undefined) {
+            updateData.motivoCancelamento =
+                data.motivoCancelamento;
+        }
+
+        return await Matricula.findByIdAndUpdate(
+            id,
+            updateData,
+            {
+                new: true,
+                runValidators: true,
+            }
+        ).populate([
+            {
+                path: "usuario",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    }
+
+    public async delete (id: string)
+    {
+        return await Matricula.findByIdAndDelete(id);
+    }
 }
