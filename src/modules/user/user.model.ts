@@ -5,7 +5,7 @@ import { Papel_usuario, type IUser } from "./user.types.js";
 const userSchema = new Schema<IUser>({
     name: {
         type: String,
-        required: false,
+        required: true,
         trim: true
     },
     cpf: {
