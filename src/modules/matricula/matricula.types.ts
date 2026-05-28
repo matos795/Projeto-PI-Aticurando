@@ -28,3 +28,11 @@ export interface IUpdateMatriculaDTO{
     status?: StatusMatricula;
     motivoCancelamento?: string;
 }
+
+/*export interface IAprovarMatricula{
+    status?: StatusMatricula;
+}
+
+export interface ICancelarMatricula{
+    motivoCancelamento?: string;
+}*/

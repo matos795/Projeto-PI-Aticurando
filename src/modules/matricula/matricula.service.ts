@@ -3,7 +3,7 @@ import Turma from "../turma/turma.model.js";
 import Matricula from "./matricula.model.js";
 import type { ICreateMatriculaDTO, IUpdateMatriculaDTO } from "./matricula.types.js";
 
-class MatriculaService {
+class matriculaService {
     public async create (data: ICreateMatriculaDTO){
         const userExistente = await User.findById(data.user);
 
@@ -122,3 +122,5 @@ class MatriculaService {
         return await Matricula.findByIdAndDelete(id);
     }
 }
+
+export default new matriculaService();
