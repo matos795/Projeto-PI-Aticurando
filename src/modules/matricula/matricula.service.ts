@@ -1,10 +1,10 @@
 import User from "../user/user.model.js";
 import Turma from "../turma/turma.model.js";
 import Matricula from "./matricula.model.js";
-import type { ICreateMatriculaDTO, IUpdateMatriculaDTO } from "./matricula.types.js";
+import type { ICreateMatriculaServiceDTO, IUpdateMatriculaDTO } from "./matricula.types.js";
 
 class matriculaService {
-    public async create (data: ICreateMatriculaDTO){
+    public async create (data: ICreateMatriculaServiceDTO){
         const userExistente = await User.findById(data.user);
 
         if (!userExistente){
@@ -41,7 +41,7 @@ class matriculaService {
 
         return await matricula.populate([ //A utilização do path ajuda a trazer as informações do usuario e da turma
             {
-                path: "usuario",
+                path: "user",
             },
             {
                 path: "turma",
@@ -70,7 +70,7 @@ class matriculaService {
     {
         return await Matricula.findById(id).populate([
             {
-                path: "usuario",
+                path: "user",
             },
             {
                 path: "turma",
@@ -106,7 +106,7 @@ class matriculaService {
             }
         ).populate([
             {
-                path: "usuario",
+                path: "user",
             },
             {
                 path: "turma",

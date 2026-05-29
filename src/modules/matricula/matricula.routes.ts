@@ -1,15 +1,19 @@
 import { Router } from "express";
 
 import matriculaController from "./matricula.controller.js";
-import { authorizeRoles, requireAuth } from "../../middlewares/auth.middleware.js";
+import * as authMiddleware from "../../middlewares/auth.middleware.js";
 import { Papel_usuario } from "../user/user.types.js";
+
+const auth = authMiddleware as any;
+const requireAuth = auth.requireAuth ?? auth.default;
+const authorizeRoles = auth.authorizeRoles ?? auth.default?.authorizeRoles;
 
 const matriculaRoutes = Router();
 
 matriculaRoutes.post("/",
                     requireAuth,
                     authorizeRoles(Papel_usuario.ALUNO),
-                    matriculaController.create);
+                    matriculaController.create as any);
 
 matriculaRoutes.get("/",
                     requireAuth,

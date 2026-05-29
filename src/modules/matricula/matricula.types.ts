@@ -19,6 +19,10 @@ export interface IMatricula{
 }
 
 export interface ICreateMatriculaDTO{
+    turma: string;
+}
+
+export interface ICreateMatriculaServiceDTO {
     user: string;
     turma: string;
 }

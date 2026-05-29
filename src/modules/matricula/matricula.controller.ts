@@ -1,25 +1,32 @@
 import type {Request, Response } from "express";
 import type { promises } from "node:dns";
 import matriculaService from "./matricula.service.js";
+import type { RequestAutenticado } from "../../types/request.types.js";
+import authService from "../auth/auth.service.js";
 
 class MatriculaController {
-    public async create(request:Request, response:Response): Promise<Response>{
-        try {
-            const {user, turma} = request.body ?? {};
+    public async create(request: RequestAutenticado,response: Response)  : Promise<Response> {
+    try {
+        const userId = request.user.id;
 
-            const matricula = await matriculaService.create({
-                user,
+        const { turma } = request.body;
+
+        const matricula =
+            await matriculaService.create({
+                user: userId,
                 turma,
             });
 
-            return response.status(201).json(matricula)
+        return response.status(201).json(
+            matricula
+        );
         } catch (error) {
-            return response.status(400).json({
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : "Erro ao criar matrícula",
-            });
+        return response.status(400).json({
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao criar matrícula",
+        });
         }
     }
 
