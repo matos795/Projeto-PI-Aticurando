@@ -1,3 +1,7 @@
+import type { Turno } from "../turma/turma.types.js";
+
+
+
 export interface IRegisterDTO {
     name: string;
     cpf: number;
@@ -19,4 +23,12 @@ export interface IRegisterCursoDTO {
 export interface IAuthMateria {
     name: string;
     description: string;
+}
+
+export interface IRegisterTurmaDTO {
+    turno: Turno;
+    curso: string;
+    dataInicio: string;
+    dataFim: string;
+    capacidade: number;
 }

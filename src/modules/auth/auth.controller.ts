@@ -55,6 +55,20 @@ class AuthController {
 
         return response.status(201).json(curso);
     }
+
+     public async registerTurma(request: Request, response: Response): Promise<Response> {
+        const { turno, curso, dataInicio, dataFim, capacidade } = request.body ?? {};
+
+        const turma = await authService.registerTurma({
+            turno,
+            curso,
+            dataInicio,
+            dataFim,
+            capacidade
+        });
+
+        return response.status(201).json(turma);
+    }
 }
 
 export default new AuthController();

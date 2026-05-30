@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
-import type { ILoginDTO, IRegisterCursoDTO, IRegisterDTO } from "./auth.types.js";
+import type { ILoginDTO, IRegisterCursoDTO, IRegisterDTO, IRegisterTurmaDTO } from "./auth.types.js";
 import cursoService from "../curso/curso.service.js";
+import turmaService from "../turma/turma.service.js";
 
 class AuthService {
 
@@ -13,6 +14,10 @@ class AuthService {
 
     public async registerCurso(data: IRegisterCursoDTO) {
         return await cursoService.create(data);
+    }
+
+    public async registerTurma(data: IRegisterTurmaDTO) {
+        return await turmaService.create(data);
     }
 
     public async login(data: ILoginDTO) {
