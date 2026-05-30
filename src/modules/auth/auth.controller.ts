@@ -43,6 +43,18 @@ class AuthController {
 
         return response.status(200).json(user);
     }
+
+     public async registerCurso(request: Request, response: Response): Promise<Response> {
+        const { name, description, materias } = request.body ?? {};
+
+        const curso = await authService.registerCurso({
+            name,
+            description,
+            materias
+        });
+
+        return response.status(201).json(curso);
+    }
 }
 
 export default new AuthController();

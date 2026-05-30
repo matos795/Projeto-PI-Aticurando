@@ -9,3 +9,14 @@ export interface ILoginDTO {
     email: string;
     senha: string;
 }
+
+export interface IRegisterCursoDTO {
+    name: string;
+    description: string;
+    materias: IAuthMateria[];
+}
+
+export interface IAuthMateria {
+    name: string;
+    description: string;
+}

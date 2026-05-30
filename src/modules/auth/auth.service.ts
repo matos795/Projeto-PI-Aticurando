@@ -2,12 +2,17 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
-import type { ILoginDTO, IRegisterDTO } from "./auth.types.js";
+import type { ILoginDTO, IRegisterCursoDTO, IRegisterDTO } from "./auth.types.js";
+import cursoService from "../curso/curso.service.js";
 
 class AuthService {
 
     public async register(data: IRegisterDTO) {
         return await userService.create(data);
+    }
+
+    public async registerCurso(data: IRegisterCursoDTO) {
+        return await cursoService.create(data);
     }
 
     public async login(data: ILoginDTO) {
