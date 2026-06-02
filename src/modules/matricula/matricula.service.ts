@@ -1,47 +1,65 @@
 import User from "../user/user.model.js";
+import { Papel_usuario } from "../user/user.types.js";
 import Turma from "../turma/turma.model.js";
 import Matricula from "./matricula.model.js";
-import type { ICreateMatriculaDTO, IUpdateMatriculaDTO } from "./matricula.types.js";
+import {
+    StatusMatricula,
+    type ICreateMatriculaDTO,
+    type IUpdateMatriculaDTO,
+} from "./matricula.types.js";
 
-class matriculaService {
-    public async create (data: ICreateMatriculaDTO){
+class MatriculaService {
+    public async create(data: ICreateMatriculaDTO) {
         const userExistente = await User.findById(data.user);
 
-        if (!userExistente){
-            throw new Error ("Usuário não encontrado!")
+        if (!userExistente) {
+            throw new Error("Usuário não encontrado");
         }
 
-        if (userExistente.papelUsuario !== "ALUNO"){
-            throw new Error ("Apenas usuários do tipo ALUNO podem possuir matrícula");
+        if (!userExistente.active) {
+            throw new Error("Usuário inativo não pode solicitar matrícula");
+        }
+
+        if (userExistente.papelUsuario !== Papel_usuario.ALUNO) {
+            throw new Error("Apenas alunos podem solicitar matrícula");
         }
 
         const turmaExistente = await Turma.findById(data.turma);
 
-        if (!turmaExistente){
-            throw new Error ("Turma não encontrada!")
+        if (!turmaExistente) {
+            throw new Error("Turma não encontrada");
+        }
+
+        if (!turmaExistente.active) {
+            throw new Error("Não é possível solicitar matrícula em turma inativa");
         }
 
         const matriculaExistente = await Matricula.findOne({
             user: data.user,
             turma: data.turma,
+            status: {
+                $in: [
+                    StatusMatricula.PENDENTE,
+                    StatusMatricula.APROVADA,
+                ],
+            },
         });
 
-        if (matriculaExistente){
+        if (matriculaExistente) {
             throw new Error(
-                "Usuário já possui solicitação para essa turma"
+                "Você já possui matrícula pendente ou aprovada para essa turma",
             );
         }
 
         const matricula = await Matricula.create({
             user: data.user,
             turma: data.turma,
-            status: "Pendente",
-            frequencia: 0,
         });
 
-        return await matricula.populate([ //A utilização do path ajuda a trazer as informações do usuario e da turma
+        return await matricula.populate([
             {
-                path: "usuario",
+                path: "user",
+                select: "name cpf email papelUsuario active",
             },
             {
                 path: "turma",
@@ -52,10 +70,11 @@ class matriculaService {
         ]);
     }
 
-    public async findAll(){
+    public async findAll() {
         return await Matricula.find().populate([
             {
                 path: "user",
+                select: "name cpf email papelUsuario active",
             },
             {
                 path: "turma",
@@ -66,11 +85,11 @@ class matriculaService {
         ]);
     }
 
-    public async findById(id: string)
-    {
+    public async findById(id: string) {
         return await Matricula.findById(id).populate([
             {
-                path: "usuario",
+                path: "user",
+                select: "name cpf email papelUsuario active",
             },
             {
                 path: "turma",
@@ -79,10 +98,10 @@ class matriculaService {
                 },
             },
         ]);
-    };
+    }
 
-     public async update(id: string,data: IUpdateMatriculaDTO) {
-        const updateData: any = {};
+    public async update(id: string, data: IUpdateMatriculaDTO) {
+        const updateData: IUpdateMatriculaDTO = {};
 
         if (data.frequencia !== undefined) {
             updateData.frequencia = data.frequencia;
@@ -93,20 +112,16 @@ class matriculaService {
         }
 
         if (data.motivoCancelamento !== undefined) {
-            updateData.motivoCancelamento =
-                data.motivoCancelamento;
+            updateData.motivoCancelamento = data.motivoCancelamento;
         }
 
-        return await Matricula.findByIdAndUpdate(
-            id,
-            updateData,
+        return await Matricula.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        }).populate([
             {
-                new: true,
-                runValidators: true,
-            }
-        ).populate([
-            {
-                path: "usuario",
+                path: "user",
+                select: "name cpf email papelUsuario active",
             },
             {
                 path: "turma",
@@ -117,10 +132,9 @@ class matriculaService {
         ]);
     }
 
-    public async delete (id: string)
-    {
+    public async delete(id: string) {
         return await Matricula.findByIdAndDelete(id);
     }
 }
 
-export default new matriculaService();
+export default new MatriculaService();

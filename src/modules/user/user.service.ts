@@ -27,7 +27,7 @@ class userService {
         cpf: data.cpf,
         email: data.email,
         senhaHash,
-        papelUsuario: Papel_usuario.ADM,
+        papelUsuario: Papel_usuario.ALUNO,
         active: true
         })
 

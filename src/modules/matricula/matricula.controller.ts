@@ -1,18 +1,34 @@
-import type {Request, Response } from "express";
-import type { promises } from "node:dns";
+import type { Request, Response } from "express";
+import type { RequestAutenticado } from "../../types/request.types.js";
 import matriculaService from "./matricula.service.js";
 
 class MatriculaController {
-    public async create(request:Request, response:Response): Promise<Response>{
+    public async create(
+        request: RequestAutenticado,
+        response: Response,
+    ): Promise<Response> {
         try {
-            const {user, turma} = request.body ?? {};
+            const userId = request.user?.id;
+            const { turma } = request.body ?? {};
+
+            if (!userId) {
+                return response.status(401).json({
+                    message: "Usuário não autenticado",
+                });
+            }
+
+            if (!turma) {
+                return response.status(400).json({
+                    message: "Turma é obrigatória",
+                });
+            }
 
             const matricula = await matriculaService.create({
-                user,
+                user: userId,
                 turma,
             });
 
-            return response.status(201).json(matricula)
+            return response.status(201).json(matricula);
         } catch (error) {
             return response.status(400).json({
                 message:
@@ -23,13 +39,19 @@ class MatriculaController {
         }
     }
 
-    public async findAll(request: Request, response: Response): Promise<Response>{
+    public async findAll(
+        request: Request,
+        response: Response,
+    ): Promise<Response> {
         const matriculas = await matriculaService.findAll();
 
         return response.status(200).json(matriculas);
     }
 
-     public async findById(request: Request, response: Response): Promise<Response> {
+    public async findById(
+        request: Request,
+        response: Response,
+    ): Promise<Response> {
         const { id } = request.params;
 
         if (!id || typeof id !== "string") {
@@ -49,15 +71,13 @@ class MatriculaController {
         return response.status(200).json(matricula);
     }
 
-    public async update(request: Request,response: Response): Promise<Response> {
+    public async update(
+        request: Request,
+        response: Response,
+    ): Promise<Response> {
         try {
             const { id } = request.params;
-
-            const {
-                frequencia,
-                status,
-                motivoCancelamento,
-            } = request.body;
+            const { frequencia, status, motivoCancelamento } = request.body;
 
             if (!id || typeof id !== "string") {
                 return response.status(400).json({
@@ -65,14 +85,11 @@ class MatriculaController {
                 });
             }
 
-            const matricula = await matriculaService.update(
-                id,
-                {
-                    frequencia,
-                    status,
-                    motivoCancelamento,
-                }
-            );
+            const matricula = await matriculaService.update(id, {
+                frequencia,
+                status,
+                motivoCancelamento,
+            });
 
             if (!matricula) {
                 return response.status(404).json({
@@ -91,7 +108,10 @@ class MatriculaController {
         }
     }
 
-    public async delete( request: Request,response: Response): Promise<Response> {
+    public async delete(
+        request: Request,
+        response: Response,
+    ): Promise<Response> {
         const { id } = request.params;
 
         if (!id || typeof id !== "string") {

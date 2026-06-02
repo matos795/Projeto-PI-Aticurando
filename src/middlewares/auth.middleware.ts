@@ -5,7 +5,7 @@ import type { Papel_usuario } from "../modules/user/user.types.js";
 
 interface IToken {
     id: string;
-    role: Papel_usuario;
+    papelUsuario: Papel_usuario;
 }
 
 export function requireAuth(
@@ -21,23 +21,28 @@ export function requireAuth(
         });
     }
 
-    const [, token] = authHeader.split(" ");
+    const [type, token] = authHeader.split(" ");
 
-    if (!token) {
+    if (type !== "Bearer" || !token) {
         return response.status(401).json({
             message: "Token inválido",
         });
     }
 
+    const jwtSecret = process.env.JWT_SECRET;
+
+    if (!jwtSecret) {
+        return response.status(500).json({
+            message: "JWT_SECRET não configurado",
+        });
+    }
+
     try {
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET as string,
-        ) as IToken;
+        const decoded = jwt.verify(token, jwtSecret) as IToken;
 
         request.user = {
             id: decoded.id,
-            papelUsuario: decoded.role,
+            papelUsuario: decoded.papelUsuario,
         };
 
         return next();
