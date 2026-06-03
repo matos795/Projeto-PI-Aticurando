@@ -136,6 +136,8 @@ class MatriculaService {
         return await Matricula.findByIdAndDelete(id);
     }
 
+
+
     public async aprovarMatricula(id: string) {
         const matricula = await Matricula.findById(id);
 
@@ -167,6 +169,35 @@ class MatriculaService {
         }
 
         matricula.status = StatusMatricula.APROVADA;
+
+        await matricula.save();
+
+        return await matricula.populate([
+            {
+                path: "user",
+                select: "name cpf email papelUsuario active",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    }
+
+    public async recusarMatricula(id: string){
+        const matricula = await Matricula.findById(id);
+
+        if (!matricula) {
+            throw new Error("Matrícula não encontrada");
+        }
+
+        if (matricula.status !== StatusMatricula.PENDENTE) {
+            throw new Error("Apenas matrículas pendentes podem ser recusadas");
+        }
+
+        matricula.status = StatusMatricula.RECUSADA;
 
         await matricula.save();
 

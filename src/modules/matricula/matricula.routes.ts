@@ -50,4 +50,11 @@ matriculaRoutes.patch(
     matriculaController.aprovarMatricula,
 );
 
+matriculaRoutes.patch(
+    "/:id/recusar",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    matriculaController.recusarMatricula,
+);
+
 export default matriculaRoutes;
