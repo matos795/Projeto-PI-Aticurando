@@ -15,7 +15,7 @@ class TurmaService {
             turno: data.turno,
             dataInicio: data.dataInicio,
             dataFim: data.dataFim,
-            curso: data.curso,
+            curso: curso,
             active: data.active ?? true,
         });
 

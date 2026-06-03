@@ -16,9 +16,9 @@ class AuthService {
         return await cursoService.create(data);
     }
 
-    public async registerTurma(data: IRegisterTurmaDTO) {
+   /*  public async registerTurma(data: IRegisterTurmaDTO) {
         return await turmaService.create(data);
-    }
+    } */
 
     public async login(data: ILoginDTO) {
         const user = await User.findOne({ email: data.email }).select("+senhaHash");
@@ -84,7 +84,7 @@ class AuthService {
             papelUsuario: user.papelUsuario,
             active: user.active
         };
-    }
+    }   
 }
 
 export default new AuthService();

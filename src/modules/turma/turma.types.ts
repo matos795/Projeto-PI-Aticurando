@@ -1,4 +1,5 @@
-import type { Types } from "mongoose";
+import type { Schema, Types } from "mongoose";
+import type { ICurso } from "../curso/curso.types.js";
 
 export enum Turno{
     MANHA = "MANHA",
@@ -10,7 +11,7 @@ export interface ITurma {
     turno: Turno;
     dataInicio: Date;
     dataFim: Date;
-    curso: Types.ObjectId;
+    curso: ICurso;
     active: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -21,7 +22,7 @@ export interface ICreateTurmaDTO {
     turno: Turno;
     dataInicio: string;
     dataFim: string;
-    curso: string;
+    curso: Schema.Types.ObjectId;  
     active?: boolean;
 }
 
@@ -30,6 +31,6 @@ export interface IUpdateTurmaDTO {
     turno?: Turno;
     dataInicio?: string;
     dataFim?: string;
-    curso?: string;
+    curso?: Schema.Types.ObjectId;
     active?: boolean;
 }
