@@ -132,6 +132,32 @@ class MatriculaController {
             message: "Matrícula deletada com sucesso",
         });
     }
-}
+
+    public async aprovarMatricula(
+        request: Request,
+        response: Response,
+    ): Promise<Response> {
+        try {
+        const { id } = request.params;
+
+        if (!id || typeof id !== "string") {
+            return response.status(400).json({
+                message: "ID inválido",
+            });
+        }
+    
+        const matricula = await matriculaService.aprovarMatricula(id);
+
+        return response.status(200).json(matricula);
+
+        } catch (error) {
+        return response.status(400).json({
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao aprovar matrícula",
+        });
+    }
+}}
 
 export default new MatriculaController();

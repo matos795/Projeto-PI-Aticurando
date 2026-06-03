@@ -43,4 +43,11 @@ matriculaRoutes.delete(
     matriculaController.delete,
 );
 
+matriculaRoutes.patch(
+    "/:id/aprovar",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    matriculaController.aprovarMatricula,
+);
+
 export default matriculaRoutes;

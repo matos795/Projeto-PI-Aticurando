@@ -135,6 +135,53 @@ class MatriculaService {
     public async delete(id: string) {
         return await Matricula.findByIdAndDelete(id);
     }
-}
 
+    public async aprovarMatricula(id: string) {
+        const matricula = await Matricula.findById(id);
+
+        if (!matricula) {
+            throw new Error("Matrícula não encontrada");
+        }
+
+        if (matricula.status !== StatusMatricula.PENDENTE) {
+            throw new Error("Apenas matrículas pendentes podem ser aprovadas");
+        }
+
+        const turma = await Turma.findById(matricula.turma);
+
+        if (!turma) {
+            throw new Error("Turma não encontrada");
+        }
+
+        if (!turma.active) {
+            throw new Error("Não é possível aprovar matrícula para turma inativa");
+        }
+
+        const matriculasAprovadas = await Matricula.countDocuments({
+            turma: matricula.turma,
+            status: StatusMatricula.APROVADA,
+        });
+
+        if (matriculasAprovadas >= turma.capacidade) {
+            throw new Error("Não há vagas disponíveis para essa turma");
+        }
+
+        matricula.status = StatusMatricula.APROVADA;
+
+        await matricula.save();
+
+        return await matricula.populate([
+            {
+                path: "user",
+                select: "name cpf email papelUsuario active",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    }
+}
 export default new MatriculaService();
