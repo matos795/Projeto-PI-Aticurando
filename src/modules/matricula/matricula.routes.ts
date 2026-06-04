@@ -23,6 +23,13 @@ matriculaRoutes.get(
 );
 
 matriculaRoutes.get(
+    "/candidaturas",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ALUNO),
+    matriculaController.findByAluno,
+);
+
+matriculaRoutes.get(
     "/:id",
     requireAuth,
     authorizeRoles(Papel_usuario.ADM),

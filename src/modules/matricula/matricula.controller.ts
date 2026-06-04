@@ -48,6 +48,23 @@ class MatriculaController {
         return response.status(200).json(matriculas);
     }
 
+    public async findByAluno(
+        request: RequestAutenticado,
+        response: Response,
+    ): Promise<Response> {
+        const userId = request.user?.id;
+
+        if (!userId) {
+            return response.status(401).json({
+                message: "Usuário não autenticado",
+            });
+        }
+
+        const matriculas = await matriculaService.findByAluno(userId);
+
+        return response.status(200).json(matriculas);
+    }
+
     public async findById(
         request: Request,
         response: Response,

@@ -85,6 +85,21 @@ class MatriculaService {
         ]);
     }
 
+    public async findByAluno(userId: string) {
+        return await Matricula.find({ user: userId }).populate([
+            {
+                path: "user",
+                select: "name cpf email papelUsuario active",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    }
+
     public async findById(id: string) {
         return await Matricula.findById(id).populate([
             {
