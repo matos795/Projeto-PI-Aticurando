@@ -3,7 +3,11 @@ import userService from "./user.service.js";
 
 class UserController {
     public async create(request: Request, response: Response): Promise<Response>{
-        const {name, cpf, email, senha} = request.body ?? {};
+        const {name, cpf, email, senha, confirmarSenha} = request.body ?? {};
+
+        if(senha !== confirmarSenha) {
+            return response.status(400).json({message: "Senhas não coincidem"});
+        }
 
         const user = await userService.create({
             name,

@@ -20,7 +20,7 @@ class userService {
             throw new Error("CPF já cadastrado, insira um CPF válido ou faça login")
         }
 
-        const senhaHash = await bcrypt.hash(data.senha,10)
+        const senhaHash = await bcrypt.hash(data.senha, 10)
 
         const user = await User.create({
         name: data.name,

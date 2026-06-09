@@ -21,6 +21,7 @@ export interface ICreateUserDTO{
     cpf: number;
     email: string;
     senha: string;
+    confirmarSenha: string;
 }
 
 export interface IUpdateUserDTO{
