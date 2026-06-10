@@ -10,6 +10,10 @@ class TurmaService {
             throw new Error("Curso não encontrado");
         }
 
+        if (new Date(data.dataInicio) >= new Date(data.dataFim)) {
+            throw new Error("Data de início deve ser anterior à data de fim");
+        }
+
         const turma = await Turma.create({
             capacidade: data.capacidade ?? 35,
             turno: data.turno,
