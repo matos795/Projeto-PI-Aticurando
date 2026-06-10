@@ -1,4 +1,5 @@
 import Materia from "../materia/materia.model.js";
+import Turma from "../turma/turma.model.js";
 import Curso from "./curso.model.js";
 import type { ICreateCursoDTO, IUpdateCursoDTO } from "./curso.types.js";
 
@@ -78,6 +79,16 @@ class CursoService {
     }
 
     public async delete(id: string) {
+        const curso = await Curso.findById(id);
+
+        if (!curso) {
+            throw new Error("Curso não encontrado");
+         }
+
+        if ((await Turma.findOne({ curso: curso })) ) {
+            throw new Error("Não é possível excluir um curso que possui turmas associadas.");
+        }
+
         return await Curso.findByIdAndDelete(id);
     }
 }
