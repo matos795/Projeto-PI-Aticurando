@@ -1,6 +1,8 @@
 import Curso from "../curso/curso.model.js";
+import Matricula from "../matricula/matricula.model.js";
+import { StatusMatricula } from "../matricula/matricula.types.js";
 import Turma from "./turma.model.js";
-import type { ICreateTurmaDTO, IUpdateTurmaDTO } from "./turma.types.js";
+import type { ICreateTurmaDTO, ITurmaMatricula, IUpdateTurmaDTO } from "./turma.types.js";
 
 class TurmaService {
     public async create (data: ICreateTurmaDTO) {
@@ -27,7 +29,23 @@ class TurmaService {
     }
 
     public async findAll() {
-        return await Turma.find().populate("curso");
+        const turmas = await Turma.find().populate("curso");
+
+        const turmasMatricula: ITurmaMatricula[] = [];
+
+        for (const turma of turmas) {
+            const matriculasAprovadas = await Matricula.countDocuments({
+                turma: turma._id,
+                status: StatusMatricula.APROVADA,
+            });
+
+            turmasMatricula.push({
+                turma,
+                vagasDisponiveis: turma.capacidade - matriculasAprovadas,
+            });
+        }
+
+        return turmasMatricula;
     }
 
     public async findById(id: string) {

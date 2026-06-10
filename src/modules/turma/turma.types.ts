@@ -34,3 +34,8 @@ export interface IUpdateTurmaDTO {
     curso?: Schema.Types.ObjectId;
     active?: boolean;
 }
+
+export interface ITurmaMatricula {
+    turma: ITurma;
+    vagasDisponiveis: number;
+}

@@ -229,5 +229,7 @@ class MatriculaService {
             },
         ]);
     }
+
+    
 }
 export default new MatriculaService();
