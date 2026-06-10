@@ -16,6 +16,19 @@ class AuthController {
         return response.status(201).json(user);
     }
 
+    public async editarMe(request: RequestAutenticado, response: Response): Promise<Response> {
+        const {name, email} = request.body ?? {};
+
+        const id = request.user?.id;
+
+        const editedUser = await authService.editarMe({
+            name,
+            email,
+        }, id);
+
+        return response.status(200).json(editedUser);
+    }
+
     public async login(request: Request, response: Response): Promise<Response> {
         const { email, senha } = request.body ?? {};
         console.log("Login attempt:", { email, senha });

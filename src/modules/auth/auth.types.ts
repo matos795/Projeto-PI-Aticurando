@@ -32,3 +32,8 @@ export interface IRegisterTurmaDTO {
     dataFim: string;
     capacidade: number;
 }
+
+export interface IEditarAuthUser {
+    name: string;
+    email: string;
+}
