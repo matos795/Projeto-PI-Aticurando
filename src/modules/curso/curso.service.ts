@@ -89,6 +89,10 @@ class CursoService {
             throw new Error("Não é possível excluir um curso que possui turmas associadas.");
         }
 
+        if(!curso.active) {
+            throw new Error("Este curso já está desativado");
+        }
+
         curso.active = false;
 
         return await curso.save();

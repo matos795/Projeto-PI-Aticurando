@@ -5,10 +5,10 @@ import Turma from "./turma.model.js";
 import type { ICreateTurmaDTO, ITurmaMatricula, IUpdateTurmaDTO } from "./turma.types.js";
 
 class TurmaService {
-    public async create (data: ICreateTurmaDTO) {
+    public async create(data: ICreateTurmaDTO) {
         const curso = await Curso.findById(data.curso); //Evita criar uma turma apontando para um curso que não existe.
 
-        if (!curso){
+        if (!curso) {
             throw new Error("Curso não encontrado");
         }
 
@@ -52,18 +52,18 @@ class TurmaService {
         return await Turma.findById(id).populate("curso");
     }
 
-    public async update(id: string, data: IUpdateTurmaDTO){
+    public async update(id: string, data: IUpdateTurmaDTO) {
         if (data.curso) {
             const curso = await Curso.findById(data.curso); //Evita editar uma turma apontando para um curso que não existe.
 
-            if (!curso){
-                throw new Error ("Curso não encontrado");
+            if (!curso) {
+                throw new Error("Curso não encontrado");
             }
         }
 
         const updateData: any = {};
 
-        if (data.capacidade !== undefined){
+        if (data.capacidade !== undefined) {
             updateData.capacidade = data.capacidade;
         }
 
@@ -92,11 +92,32 @@ class TurmaService {
             runValidators: true,
         }).populate("curso");
 
-        
+
     }
 
     public async delete(id: string) {
-        return await Turma.findByIdAndDelete(id);
+        const turma = await Turma.findById(id);
+
+        if (!turma) {
+            throw new Error("Turma não encontrada");
+        }
+
+        if (!turma.active) {
+            throw new Error("Esta turma já está desativada");
+        }
+
+        const matriculaAtiva = await Matricula.findOne({
+            turma: id,
+            active: true
+        });
+
+        if (matriculaAtiva) {
+            throw new Error("Não é possível desativar uma turma com alunos matriculados ativos.");
+        }
+
+        turma.active = false;
+
+        return await turma.save();
     }
 }
 
