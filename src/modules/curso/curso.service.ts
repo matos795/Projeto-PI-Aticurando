@@ -89,7 +89,9 @@ class CursoService {
             throw new Error("Não é possível excluir um curso que possui turmas associadas.");
         }
 
-        return await Curso.findByIdAndDelete(id);
+        curso.active = false;
+
+        return await curso.save();
     }
 }
 
