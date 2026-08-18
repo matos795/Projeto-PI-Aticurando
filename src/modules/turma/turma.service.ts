@@ -59,6 +59,11 @@ class TurmaService {
             if (!curso) {
                 throw new Error("Curso não encontrado");
             }
+
+            if (data.dataInicio && data.dataFim && new Date(data.dataInicio) >= new Date(data.dataFim)) {
+                throw new Error("Data de início deve ser anterior à data de fim");
+            }
+        
         }
 
         const updateData: any = {};
