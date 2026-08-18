@@ -32,7 +32,7 @@ class CursoService {
     }
 
     public async findAll() {
-        return await Curso.find().populate("materias.materia");
+        return await Curso.find({active: true}).populate("materias.materia");
     }
 
     public async findById(id: string) {

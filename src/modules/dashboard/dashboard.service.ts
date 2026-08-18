@@ -8,13 +8,13 @@ class DashboardService {
 
     public async findAll(){
         const dashboard: IDashboard = {
-            totalMatriculas: await Matricula.find().countDocuments(),
-            totalCursos: await Curso.find().countDocuments(),
-            totalTurmas: await Turma.find().countDocuments(),
-            matriculasAtivas: await Matricula.find({status: StatusMatricula.APROVADA}).countDocuments(),
-            matriculasRecusadas: await Matricula.find({status: StatusMatricula.RECUSADA}).countDocuments(),
-            matriculasPendentes: await Matricula.find({status: StatusMatricula.PENDENTE}).countDocuments(),
-            matriculasCanceladas: await Matricula.find({status: StatusMatricula.CANCELADA}).countDocuments(),
+            totalMatriculas: await Matricula.find({active: true}).countDocuments(),
+            totalCursos: await Curso.find({active: true}).countDocuments(),
+            totalTurmas: await Turma.find({active: true}).countDocuments(),
+            matriculasAtivas: await Matricula.find({status: StatusMatricula.APROVADA, active: true}).countDocuments(),
+            matriculasRecusadas: await Matricula.find({status: StatusMatricula.RECUSADA, active: true}).countDocuments(),
+            matriculasPendentes: await Matricula.find({status: StatusMatricula.PENDENTE, active: true}).countDocuments(),
+            matriculasCanceladas: await Matricula.find({status: StatusMatricula.CANCELADA, active: true}).countDocuments(),
             turmasInativas: await Turma.find({active: false}).countDocuments(),
             cursosInativos: await Curso.find({active: false}).countDocuments()
         }
