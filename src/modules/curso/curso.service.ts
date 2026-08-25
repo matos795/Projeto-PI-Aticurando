@@ -79,6 +79,7 @@ class CursoService {
         }).populate("materias.materia");
     }
 
+    // NOVO: adiciona uma matéria a um curso já existente, SEM mexer nas que já estavam lá
     public async addMateria(cursoId: string, data: ICreateMateriaDTO) {
         const curso = await Curso.findById(cursoId);
 
@@ -95,6 +96,33 @@ class CursoService {
         curso.materias.push({ materia: novaMateria._id } as any);
 
         await curso.save();
+
+        return await curso.populate("materias.materia");
+    }
+
+    // NOVO: remove a matéria do curso (desvincula) e desativa a matéria (soft delete)
+    public async removeMateria(cursoId: string, materiaId: string) {
+        const curso = await Curso.findById(cursoId);
+
+        if (!curso) {
+            throw new Error("Curso não encontrado");
+        }
+
+        const materiaVinculada = curso.materias.some(
+            (item: any) => item.materia.toString() === materiaId
+        );
+
+        if (!materiaVinculada) {
+            throw new Error("Esta matéria não pertence a este curso");
+        }
+
+        curso.materias = curso.materias.filter(
+            (item: any) => item.materia.toString() !== materiaId
+        ) as any;
+
+        await curso.save();
+        
+        await Materia.findByIdAndUpdate(materiaId, { active: false });
 
         return await curso.populate("materias.materia");
     }

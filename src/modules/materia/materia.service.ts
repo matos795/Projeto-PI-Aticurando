@@ -31,7 +31,19 @@ class MateriaService {
     }
 
     public async delete(id: string){
-        return await Materia.findByIdAndDelete(id);
+        const materia = await Materia.findById(id);
+
+        if (!materia) {
+            throw new Error("Matéria não encontrada");
+        }
+
+        if (!materia.active) {
+            throw new Error("Esta matéria já está desativada");
+        }
+
+        materia.active = false;
+
+        return await materia.save();
     }
 }
 
