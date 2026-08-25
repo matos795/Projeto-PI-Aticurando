@@ -85,7 +85,7 @@ class CursoService {
             throw new Error("Curso não encontrado");
          }
 
-        if ((await Turma.findOne({ curso: curso })) ) {
+        if ((await Turma.findOne({ curso: curso, active: true })) ) {
             throw new Error("Não é possível excluir um curso que possui turmas associadas.");
         }
 
