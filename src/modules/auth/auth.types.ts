@@ -1,7 +1,5 @@
 import type { Turno } from "../turma/turma.types.js";
 
-
-
 export interface IRegisterDTO {
     name: string;
     cpf: number;

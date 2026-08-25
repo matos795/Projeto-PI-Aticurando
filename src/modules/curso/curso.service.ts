@@ -2,6 +2,7 @@ import Materia from "../materia/materia.model.js";
 import Turma from "../turma/turma.model.js";
 import Curso from "./curso.model.js";
 import type { ICreateCursoDTO, IUpdateCursoDTO } from "./curso.types.js";
+import type { ICreateMateriaDTO } from "../materia/materia.types.js";
 
 class CursoService {
 
@@ -78,6 +79,26 @@ class CursoService {
         }).populate("materias.materia");
     }
 
+    public async addMateria(cursoId: string, data: ICreateMateriaDTO) {
+        const curso = await Curso.findById(cursoId);
+
+        if (!curso) {
+            throw new Error("Curso não encontrado");
+        }
+
+        const novaMateria = await Materia.create({
+            name: data.name,
+            description: data.description ?? "",
+            active: data.active ?? true,
+        });
+
+        curso.materias.push({ materia: novaMateria._id } as any);
+
+        await curso.save();
+
+        return await curso.populate("materias.materia");
+    }
+
     public async delete(id: string) {
         const curso = await Curso.findById(id);
 
@@ -85,7 +106,7 @@ class CursoService {
             throw new Error("Curso não encontrado");
          }
 
-        if ((await Turma.findOne({ curso: curso })) ) {
+        if ((await Turma.findOne({ curso: curso._id }))) {
             throw new Error("Não é possível excluir um curso que possui turmas associadas.");
         }
 

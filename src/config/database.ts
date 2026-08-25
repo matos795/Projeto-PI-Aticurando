@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
-import { error } from "node:console";
 
 class Database {
-
-    public async connect(): Promise<void>{
-        try{
+    public async connect(): Promise<void> {
+        try {
             await mongoose.connect(process.env.MONGO_URI as string);
             console.log("MongoDB conectado com sucesso!");
-        } catch{
-            console.log("Erro ao conectar ao MongoDB", error);
+        } catch (err) { 
+            console.error("Erro ao conectar ao MongoDB:", err); 
             process.exit(1);
         }
     }
