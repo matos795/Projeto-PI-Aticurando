@@ -33,7 +33,7 @@ class CursoService {
     }
 
     public async findAll() {
-        return await Curso.find().populate("materias.materia");
+        return await Curso.find({active: true}).populate("materias.materia");
     }
 
     public async findById(id: string) {
@@ -134,7 +134,7 @@ class CursoService {
             throw new Error("Curso não encontrado");
          }
 
-        if ((await Turma.findOne({ curso: curso._id }))) {
+        if ((await Turma.findOne({ curso: curso, active: true })) ) {
             throw new Error("Não é possível excluir um curso que possui turmas associadas.");
         }
 

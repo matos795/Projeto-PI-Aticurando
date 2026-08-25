@@ -29,7 +29,7 @@ class TurmaService {
     }
 
     public async findAll() {
-        const turmas = await Turma.find().populate("curso");
+        const turmas = await Turma.find({active: true}).populate("curso");
 
         const turmasMatricula: ITurmaMatricula[] = [];
 

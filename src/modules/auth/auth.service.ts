@@ -2,18 +2,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
-import type { IEditarAuthUser, ILoginDTO, IRegisterCursoDTO, IRegisterDTO, IRegisterTurmaDTO } from "./auth.types.js";
-import cursoService from "../curso/curso.service.js";
-import turmaService from "../turma/turma.service.js";
+import type { IEditarAuthUser, ILoginDTO, IRegisterDTO } from "./auth.types.js";
 
 class AuthService {
 
     public async register(data: IRegisterDTO) {
         return await userService.create(data);
-    }
-
-    public async registerCurso(data: IRegisterCursoDTO) {
-        return await cursoService.create(data);
     }
 
     public async editarMe(data: IEditarAuthUser, id?: string) {
@@ -26,10 +20,6 @@ class AuthService {
             }
         );
     }
-
-    /*  public async registerTurma(data: IRegisterTurmaDTO) {
-         return await turmaService.create(data);
-     } */
 
     public async login(data: ILoginDTO) {
         const user = await User.findOne({ email: data.email }).select("+senhaHash");

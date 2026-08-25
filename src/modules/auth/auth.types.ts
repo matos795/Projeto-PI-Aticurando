@@ -12,25 +12,6 @@ export interface ILoginDTO {
     senha: string;
 }
 
-export interface IRegisterCursoDTO {
-    name: string;
-    description: string;
-    materias: IAuthMateria[];
-}
-
-export interface IAuthMateria {
-    name: string;
-    description: string;
-}
-
-export interface IRegisterTurmaDTO {
-    turno: Turno;
-    curso: string;
-    dataInicio: string;
-    dataFim: string;
-    capacidade: number;
-}
-
 export interface IEditarAuthUser {
     name: string;
     email: string;
