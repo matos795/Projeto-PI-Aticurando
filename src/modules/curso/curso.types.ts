@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import type { ICreateMateriaDTO, IUpdateMateriaDTO } from "../materia/materia.types.js";
+import type { ICreateMateriaDTO } from "../materia/materia.types.js";
 
 export interface ICursoMateria {
     materia: Types.ObjectId;
