@@ -10,7 +10,7 @@ import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
 const routes = Router();
 
 routes.use("/auth", authRoutes);
-routes.use("/users", userRoutes);
+routes.use("/user", userRoutes);
 routes.use("/curso", cursoRoutes);
 routes.use("/materia", materiaRoutes);
 routes.use("/turma", turmaRoutes);
