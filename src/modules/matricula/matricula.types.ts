@@ -13,7 +13,7 @@ export interface IMatricula{
     dataHora: Date;
     frequencia: number;
     status: StatusMatricula;
-    motivoCancelamento?: String;
+    motivoCancelamento?: string;
     createAt?: Date;
     updateAt?: Date;
 }
