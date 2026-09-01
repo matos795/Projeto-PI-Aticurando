@@ -55,6 +55,51 @@ class CursoController {
         return response.status(200).json(curso);
     }
 
+    public async addMateria(request: Request, response: Response): Promise<Response> {
+        const { id } = request.params;
+        const { name, description, active } = request.body ?? {};
+
+        if (!id || typeof id !== "string") {
+            return response.status(400).json({
+                message: "ID inválido",
+            });
+        }
+
+        try {
+            const curso = await cursoService.addMateria(id, {
+                name,
+                description,
+                active,
+            });
+
+            return response.status(201).json(curso);
+        } catch (error) {
+            return response.status(400).json({
+                message: error instanceof Error ? error.message : "Erro ao adicionar matéria",
+            });
+        }
+    }
+
+    public async removeMateria(request: Request, response: Response): Promise<Response> {
+        const { id, materiaId } = request.params;
+
+        if (!id || typeof id !== "string" || !materiaId || typeof materiaId !== "string") {
+            return response.status(400).json({
+                message: "ID inválido",
+            });
+        }
+
+        try {
+            const curso = await cursoService.removeMateria(id, materiaId);
+
+            return response.status(200).json(curso);
+        } catch (error) {
+            return response.status(400).json({
+                message: error instanceof Error ? error.message : "Erro ao remover matéria",
+            });
+        }
+    }
+
     public async delete(request: Request, response: Response): Promise<Response> {
         const { id } = request.params;
 

@@ -2,6 +2,7 @@ import Materia from "../materia/materia.model.js";
 import Turma from "../turma/turma.model.js";
 import Curso from "./curso.model.js";
 import type { ICreateCursoDTO, IUpdateCursoDTO } from "./curso.types.js";
+import type { ICreateMateriaDTO } from "../materia/materia.types.js";
 
 class CursoService {
 
@@ -77,6 +78,53 @@ class CursoService {
             runValidators: true,
         }).populate("materias.materia");
     }
+
+    public async addMateria(cursoId: string, data: ICreateMateriaDTO) {
+        const curso = await Curso.findById(cursoId);
+
+        if (!curso) {
+            throw new Error("Curso não encontrado");
+        }
+
+        const novaMateria = await Materia.create({
+            name: data.name,
+            description: data.description ?? "",
+            active: data.active ?? true,
+        });
+
+        curso.materias.push({ materia: novaMateria._id } as any);
+
+        await curso.save();
+
+        return await curso.populate("materias.materia");
+    }
+
+    public async removeMateria(cursoId: string, materiaId: string) {
+        const curso = await Curso.findById(cursoId);
+
+        if (!curso) {
+            throw new Error("Curso não encontrado");
+        }
+
+        const materiaVinculada = curso.materias.some(
+            (item: any) => item.materia.toString() === materiaId
+        );
+
+        if (!materiaVinculada) {
+            throw new Error("Esta matéria não pertence a este curso");
+        }
+
+        curso.materias = curso.materias.filter(
+            (item: any) => item.materia.toString() !== materiaId
+        ) as any;
+
+        await curso.save();
+        
+        await Materia.findByIdAndUpdate(materiaId, { active: false });
+
+        return await curso.populate("materias.materia");
+    }
+
 
     public async delete(id: string) {
         const curso = await Curso.findById(id);

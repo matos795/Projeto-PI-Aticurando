@@ -11,7 +11,7 @@ export interface ITurma {
     turno: Turno;
     dataInicio: Date;
     dataFim: Date;
-    curso: ICurso;
+    curso: Types.ObjectId | ICurso;
     active: boolean;
     createdAt?: Date;
     updatedAt?: Date;
