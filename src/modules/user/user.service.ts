@@ -10,7 +10,7 @@ import type { IRegisterDTO } from "../auth/auth.types.js";
 const USER_ADMIN = process.env.USER_ADMIN || ""
 const USER_ADMIN_PASSWORD = process.env.USER_ADMIN_PASSWORD
 
-class userService {
+class userservice {
     public async create(data: IRegisterDTO) {
         const emailExiste = await User.findOne({ email: data.email });
 
@@ -94,4 +94,4 @@ class userService {
     }
 }
 
-export default new userService();
+export default new userservice();
