@@ -12,6 +12,13 @@ export interface IUser {
     senhaHash: string;
     papelUsuario: Papel_usuario;
     active: boolean;
+    dt_nascimento: string;
+    participacao_anterior: boolean;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+    profissao: string;
+    problemas_saude?: string;
     createAt?: string;
     updateAt?: string;
 }
@@ -22,6 +29,13 @@ export interface ICreateUserDTO{
     email: string;
     senha: string;
     confirmarSenha: string;
+    dt_nascimento: string;
+    participacao_anterior: boolean;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+    profissao: string;
+    problemas_saude?: string;
 }
 
 export interface IUpdateUserDTO{
@@ -31,5 +45,12 @@ export interface IUpdateUserDTO{
     senha?: string;
     active?: boolean;
     papelUsuario?: Papel_usuario;
+     dt_nascimento?: string;
+    participacao_anterior?: boolean;
+    estado_civil?: string;
+    telefone_principal?: string;
+    telefone_secundario?: string;
+    profissao?: string;
+    problemas_saude?: string;
 
 }
