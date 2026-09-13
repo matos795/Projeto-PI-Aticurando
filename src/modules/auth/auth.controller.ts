@@ -4,13 +4,21 @@ import type { RequestAutenticado } from "../../types/request.types.js";
 
 class AuthController {
     public async register(request: Request, response: Response): Promise<Response> {
-        const { name, cpf, email, senha } = request.body ?? {};
+        const { name, cpf, email, senha, dt_nascimento, participacao_anterior, estado_civil, telefone_principal, telefone_secundario, profissao, problemas_saude } = request.body ?? {};
 
         const user = await authService.register({
             name,
             cpf,
             email,
             senha,
+            dt_nascimento,
+            participacao_anterior,
+            estado_civil,
+            telefone_principal,
+            telefone_secundario,
+            profissao,
+            problemas_saude
+
         });
 
         return response.status(201).json(user);
