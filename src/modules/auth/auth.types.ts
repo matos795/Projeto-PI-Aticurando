@@ -9,7 +9,7 @@ export interface IRegisterDTO {
     telefone_principal: string;
     telefone_secundario: string;
     profissao: string;
-    problemas_saude?: string;
+    problemas_saude: string;
     
 }
 

@@ -18,7 +18,7 @@ export interface IUser {
     telefone_principal: string;
     telefone_secundario: string;
     profissao: string;
-    problemas_saude?: string;
+    problemas_saude: string;
     createAt?: string;
     updateAt?: string;
 }

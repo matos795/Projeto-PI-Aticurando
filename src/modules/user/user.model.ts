@@ -63,7 +63,7 @@ const userSchema = new Schema<IUser>({
     },
     problemas_saude: {
         type: String,
-        required: false
+        required: true
     },
     active: {
         type: Boolean,
