@@ -31,6 +31,40 @@ const userSchema = new Schema<IUser>({
         default: Papel_usuario.ALUNO,
         required: true
     },
+    dt_nascimento: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    participacao_anterior: {
+        type: Boolean,
+        required: true,
+        trim: true
+    },
+    estado_civil: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    telefone_principal: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    telefone_secundario: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    profissao: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    problemas_saude: {
+        type: String,
+        required: true
+    },
     active: {
         type: Boolean,
         default: true

@@ -30,6 +30,13 @@ class userService {
             name: data.name,
             cpf: data.cpf,
             email: data.email,
+            dt_nascimento: data.dt_nascimento,
+            participacao_anterior: data.participacao_anterior,
+            estado_civil: data.estado_civil,
+            telefone_principal: data.telefone_principal,
+            telefone_secundario: data.telefone_secundario,
+            profissao: data.profissao,
+            problemas_saude: data.problemas_saude,
             senhaHash,
             papelUsuario: Papel_usuario.ALUNO,
             active: true
@@ -40,6 +47,13 @@ class userService {
             name: user.name,
             cpf: user.cpf,
             email: user.email,
+            dt_nascimento: user.dt_nascimento,
+            participacao_anterior: user.participacao_anterior,
+            estado_civil: user.estado_civil,
+            telefone_principal: user.telefone_principal,
+            telefone_secundario: user.telefone_secundario,
+            profissao: user.profissao,
+            problemas_saude: user.problemas_saude,
             papel_usuario: user.papelUsuario,
             active: user.active
         };
