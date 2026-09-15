@@ -61,13 +61,19 @@ class userService {
 
     public async createAdmin() {
 
+        if (!USER_ADMIN || !USER_ADMIN_PASSWORD) {
+            throw new Error(
+                "USER_ADMIN e USER_ADMIN_PASSWORD devem estar configurados"
+            );
+        }
+
         const emailExiste = await User.findOne({ email: USER_ADMIN });
 
         if (emailExiste) {
             throw new Error("E-mail já cadastrado, não é possível criar um admin padrão")
         }
 
-        const senhaHash = await bcrypt.hash(USER_ADMIN_PASSWORD || "", 10)
+        const senhaHash = await bcrypt.hash(USER_ADMIN_PASSWORD, 10)
 
         const user = await User.create({
             name: "Administrador Aticurando",
