@@ -1,9 +1,10 @@
-import type {Types} from "mongoose"
+import type { Types } from "mongoose"
 
 export enum Papel_usuario {
     ADM = "ADM",
     ALUNO = "ALUNO",
-    PROFESSOR = "PROFESSOR"}
+    PROFESSOR = "PROFESSOR"
+}
 
 export interface IUser {
     name: string;
@@ -21,9 +22,11 @@ export interface IUser {
     problemas_saude: string;
     createAt?: string;
     updateAt?: string;
+    passwordResetTokenHash?: string;
+    passwordResetExpiresAt?: Date;
 }
 
-export interface ICreateUserDTO{
+export interface ICreateUserDTO {
     name: string;
     cpf: number;
     email: string;
@@ -38,14 +41,14 @@ export interface ICreateUserDTO{
     problemas_saude?: string;
 }
 
-export interface IUpdateUserDTO{
+export interface IUpdateUserDTO {
     name?: string;
     cpf?: number;
     email?: string;
     senha?: string;
     active?: boolean;
     papelUsuario?: Papel_usuario;
-     dt_nascimento?: string;
+    dt_nascimento?: string;
     participacao_anterior?: boolean;
     estado_civil?: string;
     telefone_principal?: string;

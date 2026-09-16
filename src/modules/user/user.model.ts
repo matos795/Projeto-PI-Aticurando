@@ -65,6 +65,16 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true
     },
+    passwordResetTokenHash: {
+        type: String,
+        required: false,
+        select: false,
+    },
+    passwordResetExpiresAt: {
+        type: Date,
+        required: false,
+        select: false,
+    },
     active: {
         type: Boolean,
         default: true
