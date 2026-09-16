@@ -22,6 +22,7 @@ class App {
 
     private routes(): void {
         this.server.use("/aticurando/v1", routes);
+        this.server.use(errorMiddleware);
     }
 }
 
