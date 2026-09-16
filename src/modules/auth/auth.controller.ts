@@ -1,25 +1,13 @@
 import type { Request, Response } from "express";
 import authService from "./auth.service.js";
 import type { RequestAutenticado } from "../../types/request.types.js";
+import { loginSchema, registerSchema } from "./auth.schemas.js";
 
 class AuthController {
     public async register(request: Request, response: Response): Promise<Response> {
-        const { name, cpf, email, senha, dt_nascimento, participacao_anterior, estado_civil, telefone_principal, telefone_secundario, profissao, problemas_saude } = request.body ?? {};
+        const data = registerSchema.parse(request.body);
 
-        const user = await authService.register({
-            name,
-            cpf,
-            email,
-            senha,
-            dt_nascimento,
-            participacao_anterior,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            profissao,
-            problemas_saude
-
-        });
+        const user = await authService.register(data);
 
         return response.status(201).json(user);
     }
@@ -38,11 +26,10 @@ class AuthController {
     }
 
     public async login(request: Request, response: Response): Promise<Response> {
-        const { email, senha } = request.body ?? {};
-        const result = await authService.login({
-            email,
-            senha,
-        });
+        
+        const data = loginSchema.parse(request.body);
+
+        const result = await authService.login(data);
 
         return response.status(200).json(result);
     }

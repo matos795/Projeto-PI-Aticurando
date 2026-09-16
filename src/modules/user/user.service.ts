@@ -6,6 +6,7 @@ import {
 } from "./user.types.js";
 import bcrypt from "bcryptjs";
 import type { IRegisterDTO } from "../auth/auth.types.js";
+import { AppError } from "../../errors/app-error.js";
 
 const USER_ADMIN = process.env.USER_ADMIN || ""
 const USER_ADMIN_PASSWORD = process.env.USER_ADMIN_PASSWORD
@@ -15,13 +16,13 @@ class userService {
         const emailExiste = await User.findOne({ email: data.email });
 
         if (emailExiste) {
-            throw new Error("E-mail já cadastrado, insira um e-mail válido ou faça login")
+            throw new AppError("E-mail já cadastrado, insira outro e-mail ou faça login", 409);
         }
 
         const cpfExiste = await User.findOne({ cpf: data.cpf });
 
         if (cpfExiste) {
-            throw new Error("CPF já cadastrado, insira um CPF válido ou faça login")
+            throw new AppError("CPF já cadastrado", 409);
         }
 
         const senhaHash = await bcrypt.hash(data.senha, 10)
@@ -62,15 +63,13 @@ class userService {
     public async createAdmin() {
 
         if (!USER_ADMIN || !USER_ADMIN_PASSWORD) {
-            throw new Error(
-                "USER_ADMIN e USER_ADMIN_PASSWORD devem estar configurados"
-            );
+            throw new AppError("USER_ADMIN e USER_ADMIN_PASSWORD devem estar configurados", 401);
         }
 
         const emailExiste = await User.findOne({ email: USER_ADMIN });
 
         if (emailExiste) {
-            throw new Error("E-mail já cadastrado, não é possível criar um admin padrão")
+            throw new AppError("E-mail já cadastrado, não é possível criar um admin padrão", 409);
         }
 
         const senhaHash = await bcrypt.hash(USER_ADMIN_PASSWORD, 10)

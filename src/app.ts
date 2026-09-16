@@ -2,6 +2,7 @@ import type { Express } from "express";
 import express from "express";
 import cors from "cors";
 import routes from "./routes.js";
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 class App {
     public server: Express;
@@ -20,6 +21,7 @@ class App {
 
     private routes(): void {
         this.server.use("/aticurando/v1", routes);
+        this.server.use(errorMiddleware);
     }
 }
 
