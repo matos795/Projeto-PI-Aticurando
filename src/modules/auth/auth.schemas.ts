@@ -25,11 +25,7 @@ export const registerSchema = z.object({
 
     dt_nascimento: z
         .string()
-        .min(1, "Data de nascimento é obrigatória")
-        .refine(
-            (data) => !Number.isNaN(Date.parse(data)),
-            "Data de nascimento inválida"
-        ),
+        .min(1, "Data de nascimento é obrigatória"),
 
     participacao_anterior: z.boolean(),
 
@@ -45,15 +41,18 @@ export const registerSchema = z.object({
 
     telefone_secundario: z
         .string()
-        .trim(),
+        .trim()
+        .optional(),
 
     profissao: z
         .string()
-        .trim(),
+        .trim()
+        .optional(),
 
     problemas_saude: z
         .string()
-        .trim(),
+        .trim()
+        .optional(),
 });
 
 export const loginSchema = z.object({
