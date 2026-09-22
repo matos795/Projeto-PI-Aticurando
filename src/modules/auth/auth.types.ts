@@ -19,6 +19,13 @@ export interface ILoginDTO {
 }
 
 export interface IEditarAuthUser {
-    name: string;
-    email: string;
+    name?: string;
+    email?: string;
+    dt_nascimento?: string;
+    participacao_anterior?: boolean;
+    estado_civil?: string;
+    telefone_principal?: string;
+    telefone_secundario?: string;
+    profissao?: string;
+    problemas_saude?: string;
 }

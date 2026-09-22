@@ -9,7 +9,7 @@ class MatriculaController {
     ): Promise<Response> {
         try {
             const userId = request.user?.id;
-            const { turma } = request.body ?? {};
+            const { turma, interesseServicos, comoSoubeCurso } = request.body ?? {};
 
             if (!userId) {
                 return response.status(401).json({
@@ -22,10 +22,12 @@ class MatriculaController {
                     message: "Turma é obrigatória",
                 });
             }
-
+            
             const matricula = await matriculaService.create({
                 user: userId,
                 turma,
+                interesseServicos,
+                comoSoubeCurso,
             });
 
             return response.status(201).json(matricula);

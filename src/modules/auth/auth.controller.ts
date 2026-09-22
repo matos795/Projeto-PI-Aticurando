@@ -13,13 +13,20 @@ class AuthController {
     }
 
     public async editarMe(request: RequestAutenticado, response: Response): Promise<Response> {
-        const {name, email} = request.body ?? {};
+        const {name, email, dt_nascimento, participacao_anterior, estado_civil, telefone_principal, telefone_secundario, profissao, problemas_saude} = request.body ?? {};
 
         const id = request.user?.id;
 
         const editedUser = await authService.editarMe({
             name,
             email,
+            dt_nascimento,
+            participacao_anterior,
+            estado_civil,
+            telefone_principal,
+            telefone_secundario,
+            profissao,
+            problemas_saude
         }, id);
 
         return response.status(200).json(editedUser);
