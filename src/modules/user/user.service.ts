@@ -5,27 +5,40 @@ import {
     type IUpdateUserDTO
 } from "./user.types.js";
 import bcrypt from "bcryptjs";
-import type { IRegisterDTO } from "../auth/auth.types.js";
+import type { RegisterDTO } from "../auth/auth.schemas.js";
 import { AppError } from "../../errors/app-error.js";
 
 const USER_ADMIN = process.env.USER_ADMIN || ""
 const USER_ADMIN_PASSWORD = process.env.USER_ADMIN_PASSWORD
 
 class userService {
-    public async create(data: IRegisterDTO) {
-        const emailExiste = await User.findOne({ email: data.email });
+    public async create(data: RegisterDTO) {
+        const emailExiste = await User.findOne({
+            email: data.email
+        });
 
         if (emailExiste) {
-            throw new AppError("E-mail já cadastrado, insira outro e-mail ou faça login", 409);
+            throw new AppError(
+                "E-mail já cadastrado, insira outro e-mail ou faça login",
+                409
+            );
         }
 
-        const cpfExiste = await User.findOne({ cpf: data.cpf });
+        const cpfExiste = await User.findOne({
+            cpf: data.cpf
+        });
 
         if (cpfExiste) {
-            throw new AppError("CPF já cadastrado", 409);
+            throw new AppError(
+                "CPF já cadastrado",
+                409
+            );
         }
 
-        const senhaHash = await bcrypt.hash(data.senha, 10)
+        const senhaHash = await bcrypt.hash(
+            data.senha,
+            10
+        );
 
         const user = await User.create({
             name: data.name,
@@ -35,13 +48,19 @@ class userService {
             participacao_anterior: data.participacao_anterior,
             estado_civil: data.estado_civil,
             telefone_principal: data.telefone_principal,
-            telefone_secundario: data.telefone_secundario,
-            profissao: data.profissao,
-            problemas_saude: data.problemas_saude,
+            ...(data.telefone_secundario !== undefined && {
+                telefone_secundario: data.telefone_secundario,
+            }),
+            ...(data.profissao !== undefined && {
+                profissao: data.profissao,
+            }),
+            ...(data.problemas_saude !== undefined && {
+                problemas_saude: data.problemas_saude,
+            }),
             senhaHash,
             papelUsuario: Papel_usuario.ALUNO,
-            active: true
-        })
+            active: true,
+        });
 
         return {
             id: user._id,
@@ -55,8 +74,10 @@ class userService {
             telefone_secundario: user.telefone_secundario,
             profissao: user.profissao,
             problemas_saude: user.problemas_saude,
-            papel_usuario: user.papelUsuario,
-            active: user.active
+
+            papelUsuario: user.papelUsuario,
+
+            active: user.active,
         };
     }
 

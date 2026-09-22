@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+const emailSchema = z
+    .string()
+    .trim()
+    .email("E-mail inválido")
+    .transform((email) => email.toLowerCase());
+
 export const registerSchema = z.object({
     name: z
         .string()
@@ -14,10 +20,7 @@ export const registerSchema = z.object({
             "CPF deve possuir 11 dígitos"
         ),
 
-    email: z
-        .string()
-        .trim()
-        .email("E-mail inválido"),
+    email: emailSchema,
 
     senha: z
         .string()
@@ -55,13 +58,35 @@ export const registerSchema = z.object({
         .optional(),
 });
 
+export type RegisterDTO = z.infer<typeof registerSchema>;
+
+
 export const loginSchema = z.object({
-    email: z
-        .string()
-        .trim()
-        .email("E-mail inválido"),
+    email: emailSchema,
 
     senha: z
         .string()
         .min(1, "Senha é obrigatória"),
 });
+
+export type LoginDTO = z.infer<typeof loginSchema>;
+
+
+export const editMeSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(3, "Nome deve possuir pelo menos 3 caracteres"),
+
+    email: emailSchema,
+});
+
+export type EditMeDTO = z.infer<typeof editMeSchema>;
+
+
+export const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
+
+export type ForgotPasswordDTO =
+    z.infer<typeof forgotPasswordSchema>;

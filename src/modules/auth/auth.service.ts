@@ -1,17 +1,24 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
-import type { IEditarAuthUser, ILoginDTO, IRegisterDTO } from "./auth.types.js";
+import emailService from "../../services/email/email.service.js";
 import { AppError } from "../../errors/app-error.js";
+import type {
+    EditMeDTO,
+    ForgotPasswordDTO,
+    LoginDTO,
+    RegisterDTO
+} from "./auth.schemas.js";
 
 class AuthService {
 
-    public async register(data: IRegisterDTO) {
-        return await userService.create(data);
+    public async register(data: RegisterDTO) {
+        return userService.create(data);
     }
 
-    public async editarMe(data: IEditarAuthUser, id?: string) {
+    public async editarMe(data: EditMeDTO, id?: string) {
         return await User.findByIdAndUpdate(id, {
             name: data.name,
             email: data.email,
@@ -22,7 +29,7 @@ class AuthService {
         );
     }
 
-    public async login(data: ILoginDTO) {
+    public async login(data: LoginDTO) {
         const user = await User.findOne({ email: data.email }).select("+senhaHash");
 
         if (!user) {
@@ -86,6 +93,48 @@ class AuthService {
             papelUsuario: user.papelUsuario,
             active: user.active
         };
+    }
+
+    public async forgotPassword(data: ForgotPasswordDTO): Promise<void> {
+        const user = await User.findOne({
+            email: data.email.toLowerCase(),
+        });
+
+        if (!user) {
+            return;
+        }
+
+        const resetToken = crypto
+            .randomBytes(32)
+            .toString("hex");
+
+        const resetTokenHash = crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+
+        const expiresMinutes = Number(
+            process.env.PASSWORD_RESET_EXPIRES_MINUTES ?? 30
+        );
+
+        user.passwordResetTokenHash = resetTokenHash;
+
+        user.passwordResetExpiresAt = new Date(
+            Date.now() + expiresMinutes * 60 * 1000
+        );
+
+        await user.save();
+
+        const frontendUrl =
+            process.env.FRONTEND_URL ?? "http://localhost:5173";
+
+        const resetUrl =
+            `${frontendUrl}/reset-password?token=${resetToken}`;
+
+        await emailService.sendPasswordReset(
+            user.email,
+            resetUrl
+        );
     }
 }
 
