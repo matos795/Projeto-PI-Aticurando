@@ -33,6 +33,16 @@ const matriculaSchema = new Schema<IMatricula>(
             required: false,
             trim: true,
         },
+        interesse_servicos: {
+            type: [String],
+            required: true,
+            trim: true,
+        },
+        como_soube: {
+            type: String,
+            required: true,
+            trim: true,
+        }
     },
     {
         timestamps: true,

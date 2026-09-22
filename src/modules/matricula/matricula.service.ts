@@ -54,6 +54,8 @@ class MatriculaService {
         const matricula = await Matricula.create({
             user: data.user,
             turma: data.turma,
+            interesse_servicos: data.interesseServicos,
+            como_soube: data.comoSoubeCurso,
         });
 
         return await matricula.populate([
