@@ -5,7 +5,8 @@ import {
     editMeSchema,
     forgotPasswordSchema,
     loginSchema,
-    registerSchema
+    registerSchema,
+    resetPasswordSchema
 } from "./auth.schemas.js";
 
 class AuthController {
@@ -69,6 +70,21 @@ class AuthController {
         return response.status(200).json({
             message:
                 "Se existir uma conta para este e-mail, enviaremos instruções de recuperação.",
+        });
+    }
+
+    public async resetPassword(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
+        const data = resetPasswordSchema.parse(
+            request.body
+        );
+
+        await authService.resetPassword(data);
+
+        return response.status(200).json({
+            message: "Senha redefinida com sucesso.",
         });
     }
 }

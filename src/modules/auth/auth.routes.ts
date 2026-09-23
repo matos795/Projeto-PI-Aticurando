@@ -9,5 +9,6 @@ authRoutes.post("/login", authController.login);
 authRoutes.get("/me", requireAuth, authController.getMe);
 authRoutes.put("/edit-me", requireAuth, authController.editarMe);
 authRoutes.post("/forgot-password", authController.forgotPassword.bind(authController));
+authRoutes.post("/reset-password", authController.resetPassword);
 
 export default authRoutes;

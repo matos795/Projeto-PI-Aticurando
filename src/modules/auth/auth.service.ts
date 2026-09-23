@@ -9,7 +9,8 @@ import type {
     EditMeDTO,
     ForgotPasswordDTO,
     LoginDTO,
-    RegisterDTO
+    RegisterDTO,
+    ResetPasswordDTO
 } from "./auth.schemas.js";
 
 class AuthService {
@@ -134,6 +135,51 @@ class AuthService {
         await emailService.sendPasswordReset(
             user.email,
             resetUrl
+        );
+    }
+
+    public async resetPassword(
+        data: ResetPasswordDTO
+    ): Promise<void> {
+        const resetTokenHash = crypto
+            .createHash("sha256")
+            .update(data.token)
+            .digest("hex");
+
+        const user = await User.findOne({
+            passwordResetTokenHash: resetTokenHash,
+
+            passwordResetExpiresAt: {
+                $gt: new Date(),
+            },
+        });
+
+        if (!user) {
+            throw new AppError(
+                "Token inválido ou expirado",
+                400
+            );
+        }
+
+        const senhaHash = await bcrypt.hash(
+            data.senha,
+            10
+        );
+
+        await User.updateOne(
+            {
+                _id: user._id,
+            },
+            {
+                $set: {
+                    senhaHash,
+                },
+
+                $unset: {
+                    passwordResetTokenHash: 1,
+                    passwordResetExpiresAt: 1,
+                },
+            }
         );
     }
 }
