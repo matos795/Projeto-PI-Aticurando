@@ -1,68 +1,195 @@
 import { z } from "zod";
 
-export const registerSchema = z.object({
-    name: z
-        .string()
-        .trim()
-        .min(3, "Nome deve possuir pelo menos 3 caracteres"),
+const emailSchema = z
+    .string()
+    .trim()
+    .email("E-mail inválido")
+    .transform((email) => email.toLowerCase());
 
-    cpf: z.coerce
-        .number()
-        .int("CPF inválido")
-        .refine(
-            (cpf) => cpf.toString().length === 11,
-            "CPF deve possuir 11 dígitos"
-        ),
+const booleanFromForm = z.preprocess(
+    (value) => {
+        if (typeof value === "string") {
+            const normalized = value
+                .trim()
+                .toLowerCase();
 
-    email: z
-        .string()
-        .trim()
-        .email("E-mail inválido"),
+            if (
+                normalized === "true" ||
+                normalized === "sim" ||
+                normalized === "1"
+            ) {
+                return true;
+            }
 
-    senha: z
-        .string()
-        .min(8, "Senha deve possuir pelo menos 8 caracteres"),
+            if (
+                normalized === "false" ||
+                normalized === "nao" ||
+                normalized === "não" ||
+                normalized === "0"
+            ) {
+                return false;
+            }
+        }
 
-    dt_nascimento: z
-        .string()
-        .min(1, "Data de nascimento é obrigatória")
-        .refine(
-            (data) => !Number.isNaN(Date.parse(data)),
-            "Data de nascimento inválida"
-        ),
+        return value;
+    },
+    z.boolean()
+);
 
-    participacao_anterior: z.boolean(),
+export const registerSchema = z
+    .object({
+        name: z
+            .string()
+            .trim()
+            .min(3, "Nome deve possuir pelo menos 3 caracteres"),
 
-    estado_civil: z
-        .string()
-        .trim()
-        .min(1, "Estado civil é obrigatório"),
+        cpf: z.coerce
+            .number()
+            .int("CPF inválido")
+            .refine(
+                (cpf) => cpf.toString().length === 11,
+                "CPF deve possuir 11 dígitos"
+            ),
 
-    telefone_principal: z
-        .string()
-        .trim()
-        .min(8, "Telefone principal inválido"),
+        email: emailSchema,
 
-    telefone_secundario: z
-        .string()
-        .trim(),
+        senha: z
+            .string()
+            .min(8, "Senha deve possuir pelo menos 8 caracteres"),
 
-    profissao: z
-        .string()
-        .trim(),
+        confirmarSenha: z
+            .string()
+            .min(8, "Confirmação da senha é obrigatória"),
 
-    problemas_saude: z
-        .string()
-        .trim(),
-});
+        dt_nascimento: z
+            .string()
+            .min(1, "Data de nascimento é obrigatória"),
+
+        participacao_anterior: booleanFromForm,
+
+        estado_civil: z
+            .string()
+            .trim()
+            .min(1, "Estado civil é obrigatório"),
+
+        telefone_principal: z
+            .string()
+            .trim()
+            .min(8, "Telefone principal inválido"),
+
+        telefone_secundario: z
+            .string()
+            .trim()
+            .optional(),
+
+        profissao: z
+            .string()
+            .trim()
+            .optional(),
+
+        problemas_saude: z
+            .string()
+            .trim()
+            .optional(),
+    })
+    .refine(
+        (data) => data.senha === data.confirmarSenha,
+        {
+            message: "As senhas não coincidem",
+            path: ["confirmarSenha"],
+        }
+    )
+    .transform(({ confirmarSenha, ...data }) => data);
+
+export type RegisterDTO = z.infer<typeof registerSchema>;
+
 
 export const loginSchema = z.object({
-    email: z
-        .string()
-        .trim()
-        .email("E-mail inválido"),
+    email: emailSchema,
 
     senha: z
         .string()
         .min(1, "Senha é obrigatória"),
 });
+
+export type LoginDTO = z.infer<typeof loginSchema>;
+
+
+export const editMeSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(3, "Nome deve possuir pelo menos 3 caracteres")
+        .optional(),
+
+    email: emailSchema.optional(),
+
+    dt_nascimento: z
+        .string()
+        .min(1, "Data de nascimento inválida")
+        .optional(),
+
+    participacao_anterior: booleanFromForm.optional(),
+
+    estado_civil: z
+        .string()
+        .trim()
+        .min(1, "Estado civil inválido")
+        .optional(),
+
+    telefone_principal: z
+        .string()
+        .trim()
+        .min(8, "Telefone principal inválido")
+        .optional(),
+
+    telefone_secundario: z
+        .string()
+        .trim()
+        .optional(),
+
+    profissao: z
+        .string()
+        .trim()
+        .optional(),
+
+    problemas_saude: z
+        .string()
+        .trim()
+        .optional(),
+});
+
+export type EditMeDTO = z.infer<typeof editMeSchema>;
+
+
+export const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
+
+export type ForgotPasswordDTO =
+    z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+    .object({
+        token: z
+            .string()
+            .min(1, "Token é obrigatório"),
+
+        senha: z
+            .string()
+            .min(8, "Senha deve possuir pelo menos 8 caracteres"),
+
+        confirmarSenha: z
+            .string()
+            .min(8, "Confirmação da senha é obrigatória"),
+    })
+    .refine(
+        (data) => data.senha === data.confirmarSenha,
+        {
+            message: "As senhas não coincidem",
+            path: ["confirmarSenha"],
+        }
+    );
+
+export type ResetPasswordDTO =
+    z.infer<typeof resetPasswordSchema>;

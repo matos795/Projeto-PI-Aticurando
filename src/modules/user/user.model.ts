@@ -33,37 +33,46 @@ const userSchema = new Schema<IUser>({
     },
     dt_nascimento: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     participacao_anterior: {
         type: Boolean,
-        required: true,
-        trim: true
+        required: false
     },
     estado_civil: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     telefone_principal: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     telefone_secundario: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     profissao: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     problemas_saude: {
         type: String,
-        required: true
+        required: false
+    },
+    passwordResetTokenHash: {
+        type: String,
+        required: false,
+        select: false,
+    },
+    passwordResetExpiresAt: {
+        type: Date,
+        required: false,
+        select: false,
     },
     active: {
         type: Boolean,

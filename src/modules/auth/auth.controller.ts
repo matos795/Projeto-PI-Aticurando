@@ -1,10 +1,19 @@
 import type { Request, Response } from "express";
 import authService from "./auth.service.js";
 import type { RequestAutenticado } from "../../types/request.types.js";
-import { loginSchema, registerSchema } from "./auth.schemas.js";
+import {
+    editMeSchema,
+    forgotPasswordSchema,
+    loginSchema,
+    registerSchema,
+    resetPasswordSchema
+} from "./auth.schemas.js";
 
 class AuthController {
-    public async register(request: Request, response: Response): Promise<Response> {
+    public async register(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
         const data = registerSchema.parse(request.body);
 
         const user = await authService.register(data);
@@ -12,28 +21,26 @@ class AuthController {
         return response.status(201).json(user);
     }
 
-    public async editarMe(request: RequestAutenticado, response: Response): Promise<Response> {
-        const {name, email, dt_nascimento, participacao_anterior, estado_civil, telefone_principal, telefone_secundario, profissao, problemas_saude} = request.body ?? {};
+    public async editarMe(
+        request: RequestAutenticado,
+        response: Response
+    ): Promise<Response> {
+        const data = editMeSchema.parse(request.body);
 
         const id = request.user?.id;
 
-        const editedUser = await authService.editarMe({
-            name,
-            email,
-            dt_nascimento,
-            participacao_anterior,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            profissao,
-            problemas_saude
-        }, id);
+        const editedUser = await authService.editarMe(
+            data,
+            id
+        );
 
         return response.status(200).json(editedUser);
     }
 
-    public async login(request: Request, response: Response): Promise<Response> {
-        
+    public async login(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
         const data = loginSchema.parse(request.body);
 
         const result = await authService.login(data);
@@ -56,6 +63,37 @@ class AuthController {
         const user = await authService.getMe(userId);
 
         return response.status(200).json(user);
+    }
+
+    public async forgotPassword(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
+        const data = forgotPasswordSchema.parse(
+            request.body
+        );
+
+        await authService.forgotPassword(data);
+
+        return response.status(200).json({
+            message:
+                "Se existir uma conta para este e-mail, enviaremos instruções de recuperação.",
+        });
+    }
+
+    public async resetPassword(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
+        const data = resetPasswordSchema.parse(
+            request.body
+        );
+
+        await authService.resetPassword(data);
+
+        return response.status(200).json({
+            message: "Senha redefinida com sucesso.",
+        });
     }
 }
 

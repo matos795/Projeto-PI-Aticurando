@@ -1,35 +1,39 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
 import User from "../user/user.model.js";
 import userService from "../user/user.service.js";
-import type { IEditarAuthUser, ILoginDTO, IRegisterDTO } from "./auth.types.js";
+import emailService from "../../services/email/email.service.js";
 import { AppError } from "../../errors/app-error.js";
+import type {
+    EditMeDTO,
+    ForgotPasswordDTO,
+    LoginDTO,
+    RegisterDTO,
+    ResetPasswordDTO
+} from "./auth.schemas.js";
 
 class AuthService {
 
-    public async register(data: IRegisterDTO) {
-        return await userService.create(data);
+    public async register(data: RegisterDTO) {
+        return userService.create(data);
     }
 
-    public async editarMe(data: IEditarAuthUser, id?: string) {
-        return await User.findByIdAndUpdate(id, {
-            name: data.name,
-            email: data.email,
-            dt_nascimento: data.dt_nascimento,
-            participacao_anterior: data.participacao_anterior,
-            estado_civil: data.estado_civil,
-            telefone_principal: data.telefone_principal,
-            telefone_secundario: data.telefone_secundario,
-            profissao: data.profissao,
-            problemas_saude: data.problemas_saude
-        },
+    public async editarMe(
+        data: EditMeDTO,
+        id?: string
+    ) {
+        return await User.findByIdAndUpdate(
+            id,
+            data,
             {
                 new: true,
+                runValidators: true,
             }
         );
     }
 
-    public async login(data: ILoginDTO) {
+    public async login(data: LoginDTO) {
         const user = await User.findOne({ email: data.email }).select("+senhaHash");
 
         if (!user) {
@@ -100,6 +104,93 @@ class AuthService {
             problemas_saude: user.problemas_saude,
             active: user.active
         };
+    }
+
+    public async forgotPassword(data: ForgotPasswordDTO): Promise<void> {
+        const user = await User.findOne({
+            email: data.email.toLowerCase(),
+        });
+
+        if (!user) {
+            return;
+        }
+
+        const resetToken = crypto
+            .randomBytes(32)
+            .toString("hex");
+
+        const resetTokenHash = crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+
+        const expiresMinutes = Number(
+            process.env.PASSWORD_RESET_EXPIRES_MINUTES ?? 30
+        );
+
+        user.passwordResetTokenHash = resetTokenHash;
+
+        user.passwordResetExpiresAt = new Date(
+            Date.now() + expiresMinutes * 60 * 1000
+        );
+
+        await user.save();
+
+        const frontendUrl =
+            process.env.FRONTEND_URL ?? "http://localhost:5173";
+
+        const resetUrl =
+            `${frontendUrl}/reset-password?token=${resetToken}`;
+
+        await emailService.sendPasswordReset(
+            user.email,
+            resetUrl
+        );
+    }
+
+    public async resetPassword(
+        data: ResetPasswordDTO
+    ): Promise<void> {
+        const resetTokenHash = crypto
+            .createHash("sha256")
+            .update(data.token)
+            .digest("hex");
+
+        const user = await User.findOne({
+            passwordResetTokenHash: resetTokenHash,
+
+            passwordResetExpiresAt: {
+                $gt: new Date(),
+            },
+        });
+
+        if (!user) {
+            throw new AppError(
+                "Token inválido ou expirado",
+                400
+            );
+        }
+
+        const senhaHash = await bcrypt.hash(
+            data.senha,
+            10
+        );
+
+        await User.updateOne(
+            {
+                _id: user._id,
+            },
+            {
+                $set: {
+                    senhaHash,
+                },
+
+                $unset: {
+                    passwordResetTokenHash: 1,
+                    passwordResetExpiresAt: 1,
+                },
+            }
+        );
     }
 }
 
