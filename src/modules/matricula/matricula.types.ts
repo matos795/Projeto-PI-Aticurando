@@ -13,6 +13,8 @@ export interface IMatricula{
     dataHora: Date;
     frequencia: number;
     status: StatusMatricula;
+    interesse_servicos: string[];
+    como_soube: string;
     motivoCancelamento?: string;
     createAt?: Date;
     updateAt?: Date;
@@ -21,10 +23,13 @@ export interface IMatricula{
 export interface ICreateMatriculaDTO{
     user: string;
     turma: string;
+    interesseServicos: string[];
+    comoSoubeCurso: string;
 }
 
 export interface IUpdateMatriculaDTO{
     frequencia?: number;
     status?: StatusMatricula;
     motivoCancelamento?: string;
+    comoSoubeCurso?: string;
 }

@@ -10,7 +10,10 @@ import {
 } from "./auth.schemas.js";
 
 class AuthController {
-    public async register(request: Request, response: Response): Promise<Response> {
+    public async register(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
         const data = registerSchema.parse(request.body);
 
         const user = await authService.register(data);
@@ -26,13 +29,18 @@ class AuthController {
 
         const id = request.user?.id;
 
-        const editedUser = await authService.editarMe(data, id);
+        const editedUser = await authService.editarMe(
+            data,
+            id
+        );
 
         return response.status(200).json(editedUser);
     }
 
-    public async login(request: Request, response: Response): Promise<Response> {
-
+    public async login(
+        request: Request,
+        response: Response
+    ): Promise<Response> {
         const data = loginSchema.parse(request.body);
 
         const result = await authService.login(data);

@@ -119,9 +119,44 @@ export const editMeSchema = z.object({
     name: z
         .string()
         .trim()
-        .min(3, "Nome deve possuir pelo menos 3 caracteres"),
+        .min(3, "Nome deve possuir pelo menos 3 caracteres")
+        .optional(),
 
-    email: emailSchema,
+    email: emailSchema.optional(),
+
+    dt_nascimento: z
+        .string()
+        .min(1, "Data de nascimento inválida")
+        .optional(),
+
+    participacao_anterior: booleanFromForm.optional(),
+
+    estado_civil: z
+        .string()
+        .trim()
+        .min(1, "Estado civil inválido")
+        .optional(),
+
+    telefone_principal: z
+        .string()
+        .trim()
+        .min(8, "Telefone principal inválido")
+        .optional(),
+
+    telefone_secundario: z
+        .string()
+        .trim()
+        .optional(),
+
+    profissao: z
+        .string()
+        .trim()
+        .optional(),
+
+    problemas_saude: z
+        .string()
+        .trim()
+        .optional(),
 });
 
 export type EditMeDTO = z.infer<typeof editMeSchema>;

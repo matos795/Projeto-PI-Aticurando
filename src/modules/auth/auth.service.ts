@@ -19,13 +19,16 @@ class AuthService {
         return userService.create(data);
     }
 
-    public async editarMe(data: EditMeDTO, id?: string) {
-        return await User.findByIdAndUpdate(id, {
-            name: data.name,
-            email: data.email,
-        },
+    public async editarMe(
+        data: EditMeDTO,
+        id?: string
+    ) {
+        return await User.findByIdAndUpdate(
+            id,
+            data,
             {
                 new: true,
+                runValidators: true,
             }
         );
     }
@@ -92,6 +95,13 @@ class AuthService {
             cpf: user.cpf,
             email: user.email,
             papelUsuario: user.papelUsuario,
+            dt_nascimento: user.dt_nascimento,
+            participacao_anterior: user.participacao_anterior,
+            estado_civil: user.estado_civil,
+            telefone_principal: user.telefone_principal,
+            telefone_secundario: user.telefone_secundario,
+            profissao: user.profissao,
+            problemas_saude: user.problemas_saude,
             active: user.active
         };
     }
