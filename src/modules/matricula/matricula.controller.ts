@@ -205,6 +205,29 @@ class MatriculaController {
         });
         }
     }
+
+    public async cancelarMatricula(request: Request, response: Response): Promise<Response>{
+        try {
+            const { id } = request.params;
+
+            if (!id || typeof id !== "string") {
+                return response.status(400).json({
+                    message: "ID inválido",
+                });
+            }
+
+            const matricula = await matriculaService.cancelarMatricula(id, request.body.motivoCancelamento);
+
+            return response.status(200).json(matricula);
+        } catch (error) {
+            return response.status(400).json({
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Erro ao cancelar matrícula",
+            });
+        }
+    }
 }
 
 export default new MatriculaController();
