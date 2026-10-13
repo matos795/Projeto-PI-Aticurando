@@ -111,13 +111,13 @@ class TurmaService {
             throw new Error("Esta turma já está desativada");
         }
 
-        const matriculaAtiva = await Matricula.findOne({
+        const matriculaAprovada = await Matricula.findOne({
             turma: id,
-            active: true
+            status: StatusMatricula.APROVADA,
         });
 
-        if (matriculaAtiva) {
-            throw new Error("Não é possível desativar uma turma com alunos matriculados ativos.");
+        if (matriculaAprovada) {
+            throw new Error("Não é possível desativar uma turma com alunos matriculados.");
         }
 
         turma.active = false;
