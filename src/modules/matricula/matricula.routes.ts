@@ -64,4 +64,11 @@ matriculaRoutes.patch(
     matriculaController.recusarMatricula,
 );
 
+matriculaRoutes.patch(
+    "/:id/cancelar",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ALUNO),
+    matriculaController.cancelarMatricula,
+);
+
 export default matriculaRoutes;

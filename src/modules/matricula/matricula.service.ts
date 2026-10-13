@@ -232,6 +232,36 @@ class MatriculaService {
         ]);
     }
 
+    public async cancelarMatricula(id: string, motivoCancelamento: string) {
+        const matricula = await Matricula.findById(id);
+
+        if (!matricula) {
+            throw new Error("Matrícula não encontrada");
+        }
+
+        if (matricula.status !== StatusMatricula.APROVADA){
+            throw new Error("Apenas matrículas aprovadas podem ser canceladas");
+        }
+        matricula.status = StatusMatricula.CANCELADA;
+        matricula.motivoCancelamento = motivoCancelamento;
+
+        await matricula.save();
+
+        return await matricula.populate([
+            {
+                path: "user",
+                select: "name cpf email papelUsuario active",
+            },
+            {
+                path: "turma",
+                populate: {
+                    path: "curso",
+                },
+            },
+        ]);
+    
+    }
+
     
 }
 export default new MatriculaService();
