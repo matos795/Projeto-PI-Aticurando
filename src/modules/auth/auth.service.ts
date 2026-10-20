@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
+import type { HydratedDocument } from "mongoose";
 import User from "../user/user.model.js";
+import type { IUser } from "../user/user.types.js";
 import userService from "../user/user.service.js";
 import emailService from "../../services/email/email.service.js";
 import { AppError } from "../../errors/app-error.js";
@@ -15,6 +17,24 @@ import type {
 
 class AuthService {
 
+    private toProfile(user: HydratedDocument<IUser>) {
+        return {
+            id: user._id,
+            name: user.name,
+            cpf: user.cpf,
+            email: user.email,
+            papelUsuario: user.papelUsuario,
+            dt_nascimento: user.dt_nascimento,
+            participacao_anterior: user.participacao_anterior,
+            estado_civil: user.estado_civil,
+            telefone_principal: user.telefone_principal,
+            telefone_secundario: user.telefone_secundario,
+            profissao: user.profissao,
+            problemas_saude: user.problemas_saude,
+            active: user.active
+        };
+    }
+
     public async register(data: RegisterDTO) {
         return userService.create(data);
     }
@@ -23,14 +43,52 @@ class AuthService {
         data: EditMeDTO,
         id?: string
     ) {
-        return await User.findByIdAndUpdate(
+        if (!id) {
+            throw new AppError("Usuário não autenticado", 401);
+        }
+
+        // Lista explicitamente os campos que o próprio usuário pode editar.
+        // E-mail e CPF ficam fora desta lista e não serão alterados por este método,
+        // mesmo que alguém tente enviá-los manualmente na requisição.
+        const dadosPermitidos = {
+            ...(data.name !== undefined ? { name: data.name } : {}),
+            ...(data.dt_nascimento !== undefined
+                ? { dt_nascimento: data.dt_nascimento }
+                : {}),
+            ...(data.participacao_anterior !== undefined
+                ? { participacao_anterior: data.participacao_anterior }
+                : {}),
+            ...(data.estado_civil !== undefined
+                ? { estado_civil: data.estado_civil }
+                : {}),
+            ...(data.telefone_principal !== undefined
+                ? { telefone_principal: data.telefone_principal }
+                : {}),
+            ...(data.telefone_secundario !== undefined
+                ? { telefone_secundario: data.telefone_secundario }
+                : {}),
+            ...(data.profissao !== undefined
+                ? { profissao: data.profissao }
+                : {}),
+            ...(data.problemas_saude !== undefined
+                ? { problemas_saude: data.problemas_saude }
+                : {}),
+        };
+
+        const user = await User.findByIdAndUpdate(
             id,
-            data,
+            dadosPermitidos,
             {
                 new: true,
                 runValidators: true,
             }
         );
+
+        if (!user) {
+            throw new AppError("Usuário não encontrado", 404);
+        }
+
+        return this.toProfile(user);
     }
 
     public async login(data: LoginDTO) {
@@ -89,21 +147,7 @@ class AuthService {
             throw new AppError("Usuário não encontrado", 404);
         }
 
-        return {
-            id: user._id,
-            name: user.name,
-            cpf: user.cpf,
-            email: user.email,
-            papelUsuario: user.papelUsuario,
-            dt_nascimento: user.dt_nascimento,
-            participacao_anterior: user.participacao_anterior,
-            estado_civil: user.estado_civil,
-            telefone_principal: user.telefone_principal,
-            telefone_secundario: user.telefone_secundario,
-            profissao: user.profissao,
-            problemas_saude: user.problemas_saude,
-            active: user.active
-        };
+        return this.toProfile(user);
     }
 
     public async forgotPassword(data: ForgotPasswordDTO): Promise<void> {
