@@ -1,6 +1,6 @@
 import "dotenv/config";
 import app from "./app.js"
-import database from "./config/database.js"
+import { connectToMongoDB, disconnectFromMongoDB } from "./config/database.js"
 import User from "./modules/user/user.model.js";
 import { Papel_usuario } from "./modules/user/user.types.js";
 import userService from "./modules/user/user.service.js";
@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer():Promise<void> {
     try {
-        await database.connect();
+        await connectToMongoDB();
         app.listen(PORT, () => {
             console.log(`Servidor rodando na porta ${PORT}`);
         })
