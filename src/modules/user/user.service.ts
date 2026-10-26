@@ -48,6 +48,7 @@ class userService {
             participacao_anterior: data.participacao_anterior,
             estado_civil: data.estado_civil,
             telefone_principal: data.telefone_principal,
+            aceite_lgpd: data.aceite_lgpd,
             ...(data.telefone_secundario !== undefined && {
                 telefone_secundario: data.telefone_secundario,
             }),
@@ -74,9 +75,8 @@ class userService {
             telefone_secundario: user.telefone_secundario,
             profissao: user.profissao,
             problemas_saude: user.problemas_saude,
-
+            aceite_lgpd: user.aceite_lgpd,
             papelUsuario: user.papelUsuario,
-
             active: user.active,
         };
     }
@@ -101,7 +101,8 @@ class userService {
             email: USER_ADMIN,
             senhaHash,
             papelUsuario: Papel_usuario.ADM,
-            active: true
+            active: true,
+            aceite_lgpd: true
         })
 
         return {
