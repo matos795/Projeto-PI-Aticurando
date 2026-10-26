@@ -47,9 +47,6 @@ class AuthService {
             throw new AppError("Usuário não autenticado", 401);
         }
 
-        // Lista explicitamente os campos que o próprio usuário pode editar.
-        // E-mail e CPF ficam fora desta lista e não serão alterados por este método,
-        // mesmo que alguém tente enviá-los manualmente na requisição.
         const dadosPermitidos = {
             ...(data.name !== undefined ? { name: data.name } : {}),
             ...(data.dt_nascimento !== undefined
