@@ -6,8 +6,7 @@ import type { ICreateTurmaDTO, ITurmaMatricula, IUpdateTurmaDTO } from "./turma.
 
 class TurmaService {
     public async create(data: ICreateTurmaDTO) {
-        const curso = await Curso.findById(data.curso); //Evita criar uma turma apontando para um curso que não existe.
-
+        const curso = await Curso.findById(data.curso);
         if (!curso) {
             throw new Error("Curso não encontrado");
         }
@@ -54,7 +53,7 @@ class TurmaService {
 
     public async update(id: string, data: IUpdateTurmaDTO) {
         if (data.curso) {
-            const curso = await Curso.findById(data.curso); //Evita editar uma turma apontando para um curso que não existe.
+            const curso = await Curso.findById(data.curso);
 
             if (!curso) {
                 throw new Error("Curso não encontrado");
