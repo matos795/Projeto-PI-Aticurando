@@ -25,6 +25,7 @@ export interface IUser {
     updateAt?: string;
     passwordResetTokenHash?: string;
     passwordResetExpiresAt?: Date;
+    photo?: string | null;
 }
 
 export interface ICreateUserDTO {

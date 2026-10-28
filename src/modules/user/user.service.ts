@@ -61,6 +61,7 @@ class userService {
             senhaHash,
             papelUsuario: Papel_usuario.ALUNO,
             active: true,
+            photo: null,
         });
 
         return {
@@ -78,6 +79,7 @@ class userService {
             aceite_lgpd: user.aceite_lgpd,
             papelUsuario: user.papelUsuario,
             active: user.active,
+            photo: user.photo,
         };
     }
 
@@ -102,7 +104,8 @@ class userService {
             senhaHash,
             papelUsuario: Papel_usuario.ADM,
             active: true,
-            aceite_lgpd: true
+            aceite_lgpd: true,
+            photo : null
         })
 
         return {
@@ -111,7 +114,8 @@ class userService {
             cpf: user.cpf,
             email: user.email,
             papel_usuario: user.papelUsuario,
-            active: user.active
+            active: user.active,
+            photo: user.photo
         };
     }
 
@@ -128,6 +132,27 @@ class userService {
             new: true,
             runValidators: true,
         })
+    }
+
+    public async updateOwnPhoto(id: string, photo: string) {
+        const user = await User.findByIdAndUpdate(
+            id,
+            { photo },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if(!user) {
+            throw new AppError("Usuário não encontrado", 404);
+        }
+
+        return {
+            id: user._id,
+            name: user.name,
+            photo: user.photo
+        };
     }
 
     public async delete(id: string) {

@@ -81,7 +81,11 @@ const userSchema = new Schema<IUser>({
     active: {
         type: Boolean,
         default: true
-    }
+    },
+    photo: {
+        type: String,
+        default: null
+    },
 },
     {
         timestamps: true,
