@@ -1,23 +1,22 @@
 import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 
-const uri = process.env.MONGODB_URI as string;
+export async function connectToMongoDB() {
+  const uri = process.env.MONGODB_URI as string;
 
 if (!uri) {
   throw new Error('A variável de ambiente MONGODB_URI não foi definida.');
 }
 
-const client = new MongoClient(uri);
-
-export async function connectToMongoDB() {
   try {
-    await client.connect();
+    await mongoose.connect(uri);
     console.log("Sucesso ao conectar-se ao MongoDB!");
-    return client;
+    return mongoose;
   } catch (err) {
     console.dir(err);
   }
 }
 
 export async function disconnectFromMongoDB() {
-  await client.close();
+  await mongoose.disconnect();
 }
