@@ -91,6 +91,12 @@ export const registerSchema = z
             .string()
             .trim()
             .optional(),
+
+        aceite_lgpd: z
+            .boolean()
+            .refine((val) => val === true, {
+                message: "Você deve aceitar os termos da LGPD para se cadastrar",
+            }),
     })
     .refine(
         (data) => data.senha === data.confirmarSenha,

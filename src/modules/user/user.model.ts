@@ -64,6 +64,10 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: false
     },
+    aceite_lgpd: {
+        type: Boolean,
+        required: true,
+    },
     passwordResetTokenHash: {
         type: String,
         required: false,
