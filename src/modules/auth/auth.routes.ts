@@ -1,10 +1,11 @@
 import { Router } from "express";
 import authController from "./auth.controller.js";
 import { requireAuth } from "../../middlewares/auth.middleware.js";
+import { upload } from "../../config/upload.js";
 
 const authRoutes = Router();
 
-authRoutes.post("/register", authController.register);
+authRoutes.post("/register", upload.single("photo"), authController.register);
 authRoutes.post("/login", authController.login);
 authRoutes.get("/me", requireAuth, authController.getMe);
 authRoutes.put("/edit-me", requireAuth, authController.editarMe);

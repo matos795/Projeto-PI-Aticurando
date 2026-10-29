@@ -16,6 +16,8 @@ class AuthController {
     ): Promise<Response> {
         const data = registerSchema.parse(request.body);
 
+        const caminhoFoto = request.file ? `/storage/${request.f}`
+
         const user = await authService.register(data);
 
         return response.status(201).json(user);
