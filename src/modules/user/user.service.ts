@@ -12,7 +12,7 @@ const USER_ADMIN = process.env.USER_ADMIN || ""
 const USER_ADMIN_PASSWORD = process.env.USER_ADMIN_PASSWORD
 
 class userService {
-    public async create(data: RegisterDTO) {
+    public async create(data: RegisterDTO, caminhoFoto?: string) {
         const emailExiste = await User.findOne({
             email: data.email
         });
@@ -61,7 +61,7 @@ class userService {
             senhaHash,
             papelUsuario: Papel_usuario.ALUNO,
             active: true,
-            photo: null,
+            photo: caminhoFoto ?? null,
         });
 
         return {

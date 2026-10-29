@@ -35,8 +35,8 @@ class AuthService {
         };
     }
 
-    public async register(data: RegisterDTO) {
-        return userService.create(data);
+    public async register(data: RegisterDTO, caminhoFoto?: string) {
+        return userService.create(data, caminhoFoto);
     }
 
     public async editarMe(

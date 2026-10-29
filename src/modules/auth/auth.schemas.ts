@@ -99,10 +99,6 @@ export const registerSchema = z
             .refine((val) => val === true, {
                 message: "Você deve aceitar os termos da LGPD para se cadastrar",
             }),
-
-        photo: z
-            .string()
-            .optional(),
     })
     .refine(
         (data) => data.senha === data.confirmarSenha,
