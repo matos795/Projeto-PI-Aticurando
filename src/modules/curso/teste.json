@@ -1,0 +1,35 @@
+{
+  name: 'PALHAÇARIA',
+  description: 'Curso formador de palhaços para visitas em hospitais.',
+  active: true,
+  materias: [
+    {
+      materia: {
+        id:  ObjectId('6a2c6f61a9de23e1edc7cede'),
+        aulas: [
+          {
+            id: ObjectId('6a2c6f61a9de23e1edc7cedb'),
+            name: 'Aula 1',
+            description: 'Aula de introdução à palhaçaria.',
+            duration: 60
+          },
+          {
+            id: ObjectId('6a2c6f61a9de23e1edc7cedc'),
+            name: 'Aula 2',
+            description: 'Aula de técnicas de improvisação.',
+            duration: 90
+          }
+        ]
+    }
+    },
+    {
+      materia: ObjectId('6a2c6f61a9de23e1edc7cedf')
+    },
+    {
+      materia: ObjectId('6aab36e73d3f500c8f6c5526')
+    }
+  ],
+  createdAt: ISODate('2026-06-12T20:43:13.637Z'),
+  updatedAt: ISODate('2026-10-07T22:27:53.351Z'),
+  __v: NumberInt('3')
+}
