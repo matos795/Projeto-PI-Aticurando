@@ -31,7 +31,8 @@ class AuthService {
             telefone_secundario: user.telefone_secundario,
             profissao: user.profissao,
             problemas_saude: user.problemas_saude,
-            active: user.active
+            active: user.active,
+            photo: user.photo
         };
     }
 
@@ -133,6 +134,7 @@ class AuthService {
                 cpf: user.cpf,
                 email: user.email,
                 papelUsuario: user.papelUsuario,
+                photo: user.photo,
             },
         };
     }
