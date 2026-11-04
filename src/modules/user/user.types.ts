@@ -20,6 +20,7 @@ export interface IUser {
     telefone_secundario?: string;
     profissao?: string;
     problemas_saude?: string;
+    aceite_lgpd: boolean;
     createAt?: string;
     updateAt?: string;
     passwordResetTokenHash?: string;
@@ -39,6 +40,7 @@ export interface ICreateUserDTO {
     telefone_secundario: string;
     profissao: string;
     problemas_saude?: string;
+    aceite_lgpd: boolean;
 }
 
 export interface IUpdateUserDTO {
@@ -55,5 +57,5 @@ export interface IUpdateUserDTO {
     telefone_secundario?: string;
     profissao?: string;
     problemas_saude?: string;
-
+    aceite_lgpd?: boolean;
 }

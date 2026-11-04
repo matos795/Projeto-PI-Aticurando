@@ -9,8 +9,7 @@ import { StatusAula } from "./turma.types.js";
 
 class TurmaService {
     public async create(data: ICreateTurmaDTO) {
-        const curso = await Curso.findById(data.curso); //Evita criar uma turma apontando para um curso que não existe.
-
+        const curso = await Curso.findById(data.curso);
         if (!curso) {
             throw new Error("Curso não encontrado");
         }
@@ -75,7 +74,7 @@ class TurmaService {
 
     public async update(id: string, data: IUpdateTurmaDTO) {
         if (data.curso) {
-            const curso = await Curso.findById(data.curso); //Evita editar uma turma apontando para um curso que não existe.
+            const curso = await Curso.findById(data.curso);
 
             if (!curso) {
                 throw new Error("Curso não encontrado");
@@ -132,13 +131,13 @@ class TurmaService {
             throw new Error("Esta turma já está desativada");
         }
 
-        const matriculaAtiva = await Matricula.findOne({
+        const matriculaAprovada = await Matricula.findOne({
             turma: id,
-            active: true
+            status: StatusMatricula.APROVADA,
         });
 
-        if (matriculaAtiva) {
-            throw new Error("Não é possível desativar uma turma com alunos matriculados ativos.");
+        if (matriculaAprovada) {
+            throw new Error("Não é possível desativar uma turma com alunos matriculados.");
         }
 
         turma.active = false;
