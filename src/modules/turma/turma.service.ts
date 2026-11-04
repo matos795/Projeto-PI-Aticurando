@@ -3,6 +3,9 @@ import Matricula from "../matricula/matricula.model.js";
 import { StatusMatricula } from "../matricula/matricula.types.js";
 import Turma from "./turma.model.js";
 import type { ICreateTurmaDTO, ITurmaMatricula, IUpdateTurmaDTO } from "./turma.types.js";
+import AulaTurma from "./aula-turma.model.js";
+import Aula from "../aula/aula.model.js";
+import { StatusAula } from "./turma.types.js";
 
 class TurmaService {
     public async create(data: ICreateTurmaDTO) {
@@ -23,6 +26,24 @@ class TurmaService {
             curso: curso,
             active: data.active ?? true,
         });
+
+        const materiaIds = curso.materias.map((item: any) => item.materia);
+
+        if (materiaIds.length > 0) {
+            const aulas = await Aula.find({materiaId: {$in: materiaIds}});
+
+            const ocorrencias = aulas.map((aula) =>{
+                return{
+                    aula: aula._id,
+                    turma: turma._id,
+                    status: StatusAula.PENDENTE
+                };
+            });
+
+            if (ocorrencias.length > 0) {
+                await AulaTurma.insertMany(ocorrencias);
+            }   
+        }
 
         return await turma.populate("curso");
     }

@@ -6,6 +6,7 @@ import turmaRoutes from "./modules/turma/turma.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import matriculaRoutes from "./modules/matricula/matricula.routes.js";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
+import aulaRoutes from "./modules/aula/aula.routes.js";
 import mongoose from "mongoose";
 
 const routes = Router();
@@ -52,4 +53,6 @@ routes.use("/materia", materiaRoutes);
 routes.use("/turma", turmaRoutes);
 routes.use("/matricula", matriculaRoutes);
 routes.use("/dashboard", dashboardRoutes);
+routes.use("/aula", aulaRoutes);
+
 export default routes;
