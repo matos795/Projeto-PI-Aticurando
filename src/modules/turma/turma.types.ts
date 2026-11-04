@@ -6,6 +6,29 @@ export enum Turno{
     TARDE = "TARDE",
     NOITE = "NOITE"} ;
 
+export enum StatusAula {
+    PENDENTE = "PENDENTE",
+    AGENDADA = "AGENDADA",
+    REALIZADA = "REALIZADA",
+    CANCELADA = "CANCELADA"
+} 
+
+export interface IAulaTurma extends Document {
+    aula: Types.ObjectId;
+    turma: Types.ObjectId;
+    dataInicio: Date;
+    dataFim: Date;
+    professor: Types.ObjectId;
+    status: StatusAula;
+}
+
+export interface IUpdateAulaTurmaDTO {
+    dataInicio?: Date;
+    dataFim?: Date;
+    professor?: string; 
+    status?: StatusAula;
+}
+
 export interface ITurma {
     capacidade: number;
     turno: Turno;
