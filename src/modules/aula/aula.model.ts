@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import type { IAula } from '../aula/aula.types.js';
 
 const aulaSchema = new Schema<IAula>(

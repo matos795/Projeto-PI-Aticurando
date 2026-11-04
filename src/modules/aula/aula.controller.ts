@@ -1,12 +1,11 @@
 import type { Request, Response } from "express";
-import AulaService from "./aula.service.js";
 import aulaService from "./aula.service.js";
 
 class AulaController {
     public async create(req: Request, res: Response){
         try{
             const {titulo, descricao, duracao, materiaId, ordem} = req.body ?? {};
-            const aula = await AulaService.create({
+            const aula = await aulaService.create({
                 titulo,
                 descricao,
                 duracao,
@@ -23,8 +22,9 @@ class AulaController {
             const aulas = await aulaService.findAll();
             return res.status(200).json(aulas);
         } catch (error: any) {
-            return res.status(500).json({ error: "Erro interno no servidor" });
-        }
+        console.error(error);
+        return res.status(500).json({ error: "Erro interno no servidor" });
+         }
     }
 
     public async findAllByMateria(req: Request, res: Response) {
