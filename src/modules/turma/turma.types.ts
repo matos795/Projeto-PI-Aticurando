@@ -22,6 +22,13 @@ export interface IAulaTurma extends Document {
     status: StatusAula;
 }
 
+export interface IUpdateAulaTurmaDTO {
+    dataInicio?: Date;
+    dataFim?: Date;
+    professor?: string; 
+    status?: StatusAula;
+}
+
 export interface ITurma {
     capacidade: number;
     turno: Turno;
