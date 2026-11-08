@@ -5,6 +5,34 @@ import { Papel_usuario } from "./user.types.js";
 
 const userRoutes = Router();
 
+userRoutes.post(
+    "/professor",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    userController.createProfessor
+);
+
+userRoutes.put(
+    "/professor/:id",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    userController.updateProfessor
+);
+
+userRoutes.get(
+    "/professor",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    userController.findAllProfessores
+);
+
+userRoutes.patch(
+    "/professor/:id/inativar",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    userController.inactivateProfessor
+);
+
 userRoutes.get(
     "/",
     requireAuth,
