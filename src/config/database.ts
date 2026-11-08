@@ -1,16 +1,21 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-class Database {
+export async function connectToMongoDB() {
+  const uri = process.env.MONGODB_URI as string;
 
-    public async connect(): Promise<void>{
-        try{
-            await mongoose.connect(process.env.MONGO_URI as string);
-            console.log("MongoDB conectado com sucesso!");
-        } catch(error){
-            console.error("Erro ao conectar ao MongoDB", error);
-            process.exit(1);
-        }
-    }
+if (!uri) {
+  throw new Error('A variável de ambiente MONGODB_URI não foi definida.');
 }
 
-export default new Database();
+  try {
+    await mongoose.connect(uri);
+    console.log("Sucesso ao conectar-se ao MongoDB!");
+    return mongoose;
+  } catch (err) {
+    console.dir(err);
+  }
+}
+
+export async function disconnectFromMongoDB() {
+  await mongoose.disconnect();
+}
