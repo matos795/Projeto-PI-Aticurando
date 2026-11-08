@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export async function connectToMongoDB() {
-  const uri = process.env.MONGODB_URI as string;
+  const uri = process.env.MONGO_URI as string;
 
 if (!uri) {
   throw new Error('A variável de ambiente MONGODB_URI não foi definida.');
