@@ -16,7 +16,9 @@ class AuthController {
     ): Promise<Response> {
         const data = registerSchema.parse(request.body);
 
-        const user = await authService.register(data);
+        const caminhoFoto = request.file ? `/storage/${request.file.filename}` : undefined;
+
+        const user = await authService.register(data, caminhoFoto);
 
         return response.status(201).json(user);
     }
