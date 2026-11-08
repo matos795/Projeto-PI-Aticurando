@@ -14,7 +14,7 @@ const USER_ADMIN = process.env.USER_ADMIN || ""
 const USER_ADMIN_PASSWORD = process.env.USER_ADMIN_PASSWORD
 
 class userService {
-    public async create(data: RegisterDTO) {
+    public async create(data: RegisterDTO, caminhoFoto?: string) {
         const emailExiste = await User.findOne({
             email: data.email
         });
@@ -63,6 +63,7 @@ class userService {
             senhaHash,
             papelUsuario: Papel_usuario.ALUNO,
             active: true,
+            photo: caminhoFoto ?? null,
         });
 
         return {
@@ -80,6 +81,7 @@ class userService {
             aceite_lgpd: user.aceite_lgpd,
             papelUsuario: user.papelUsuario,
             active: user.active,
+            photo: user.photo,
         };
     }
 
@@ -104,7 +106,8 @@ class userService {
             senhaHash,
             papelUsuario: Papel_usuario.ADM,
             active: true,
-            aceite_lgpd: true
+            aceite_lgpd: true,
+            photo : null
         })
 
         return {
@@ -113,7 +116,8 @@ class userService {
             cpf: user.cpf,
             email: user.email,
             papel_usuario: user.papelUsuario,
-            active: user.active
+            active: user.active,
+            photo: user.photo
         };
     }
 
@@ -130,6 +134,27 @@ class userService {
             new: true,
             runValidators: true,
         })
+    }
+
+    public async updateOwnPhoto(id: string, photo: string) {
+        const user = await User.findByIdAndUpdate(
+            id,
+            { photo },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if(!user) {
+            throw new AppError("Usuário não encontrado", 404);
+        }
+
+        return {
+            id: user._id,
+            name: user.name,
+            photo: user.photo
+        };
     }
 
     public async delete(id: string) {
