@@ -1,6 +1,6 @@
 import "dotenv/config";
 import app from "./app.js"
-import { connectToMongoDB, disconnectFromMongoDB } from "./config/database.js"
+import { connectToMongoDB } from "./config/database.js"
 import User from "./modules/user/user.model.js";
 import { Papel_usuario } from "./modules/user/user.types.js";
 import userService from "./modules/user/user.service.js";
