@@ -1,6 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 import type { IMateria } from "./materia.types.js";
 
+
 const materiaSchema = new Schema<IMateria>(
     {
         name: {
@@ -13,6 +14,11 @@ const materiaSchema = new Schema<IMateria>(
             required: false,
             trim: true
         },
+        //aulas: [{
+        //    type: Schema.Types.ObjectId,
+        //    ref: "Aula",
+        //    default: []
+        //}],
         active:{
             type: Boolean,
             default: true

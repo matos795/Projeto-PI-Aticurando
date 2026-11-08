@@ -4,7 +4,21 @@ import type { RequestAutenticado } from "../../types/request.types.js";
 
 class UserController {
     public async create(request: Request, response: Response): Promise<Response>{
-        const {name, cpf, email, senha, confirmarSenha, dt_nascimento, participacao_anterior, estado_civil, telefone_principal, telefone_secundario, profissao, problemas_saude, aceite_lgpd} = request.body ?? {};
+        const {
+            name, 
+            cpf, 
+            email, 
+            senha, 
+            confirmarSenha, 
+            dt_nascimento, 
+            participacao_anterior, 
+            estado_civil, 
+            telefone_principal, 
+            telefone_secundario, 
+            profissao, 
+            problemas_saude,
+            aceite_lgpd
+        } = request.body ?? {};
 
         if(senha !== confirmarSenha) {
             return response.status(400).json({message: "Senhas não coincidem"});
