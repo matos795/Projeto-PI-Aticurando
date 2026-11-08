@@ -72,6 +72,7 @@ export interface ICreateProfessorDTO {
     telefone_principal: string;
     telefone_secundario?: string;
     aceite_lgpd: boolean;
+    photo?: string | null;
 }
 
 export interface IUpdateProfessorDTO {

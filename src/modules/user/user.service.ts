@@ -190,6 +190,8 @@ class userService {
             ...(data.telefone_secundario !== undefined && { telefone_secundario: data.telefone_secundario }),
             papelUsuario: Papel_usuario.PROFESSOR,
             active: true,
+            aceite_lgpd: data.aceite_lgpd,
+            photo: data.photo ?? null,
             
         });
 
@@ -200,6 +202,8 @@ class userService {
             email: professor.email,
             papelUsuario: professor.papelUsuario,
             active: professor.active,
+            lgpd: professor.aceite_lgpd,
+            photo: professor.photo
         };
     }
 

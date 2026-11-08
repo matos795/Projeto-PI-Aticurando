@@ -3,210 +3,234 @@ import userService from "./user.service.js";
 import type { RequestAutenticado } from "../../types/request.types.js";
 
 class UserController {
-    public async create(request: Request, response: Response): Promise<Response>{
-        const {
-            name, 
-            cpf, 
-            email, 
-            senha, 
-            confirmarSenha, 
-            dt_nascimento, 
-            participacao_anterior, 
-            estado_civil, 
-            telefone_principal, 
-            telefone_secundario, 
-            profissao, 
-            problemas_saude,
-            aceite_lgpd
-        } = request.body ?? {};
+  public async create(request: Request, response: Response): Promise<Response> {
+    const {
+      name,
+      cpf,
+      email,
+      senha,
+      confirmarSenha,
+      dt_nascimento,
+      participacao_anterior,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      profissao,
+      problemas_saude,
+      aceite_lgpd,
+    } = request.body ?? {};
 
-        if(senha !== confirmarSenha) {
-            return response.status(400).json({message: "Senhas não coincidem"});
-        }
-
-        const user = await userService.create({
-            name,
-            cpf,
-            email,
-            senha,
-            dt_nascimento,
-            participacao_anterior,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            profissao,
-            problemas_saude,
-            aceite_lgpd
-        });
-
-        return response.status(201).json(user);
+    if (senha !== confirmarSenha) {
+      return response.status(400).json({ message: "Senhas não coincidem" });
     }
 
-    public async createProfessor(request: Request, response: Response): Promise<Response>{
-        const {
-            name,
-            cpf,
-            email,
-            senha,
-            confirmarSenha,
-            dt_nascimento,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            aceite_lgpd
-        } = request.body ?? {};
+    const user = await userService.create({
+      name,
+      cpf,
+      email,
+      senha,
+      dt_nascimento,
+      participacao_anterior,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      profissao,
+      problemas_saude,
+      aceite_lgpd,
+    });
 
-        if (senha !== confirmarSenha) {
-            return response.status(400).json({ message: "Senhas não coincidem" });
-        }
+    return response.status(201).json(user);
+  }
 
-        const professor = await userService.createProfessor({
-            name,
-            cpf,
-            email,
-            senha,
-            confirmarSenha,
-            dt_nascimento,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            aceite_lgpd
-        });
+  public async createProfessor(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const photo = request.file ? `/storage/${request.file.filename}` : null;
 
-        return response.status(201).json(professor);
+    const {
+      name,
+      cpf,
+      email,
+      senha,
+      confirmarSenha,
+      dt_nascimento,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      aceite_lgpd,
+    } = request.body ?? {};
+
+    if (senha !== confirmarSenha) {
+      return response.status(400).json({ message: "Senhas não coincidem" });
     }
 
-    public async findAll(request: Request, response: Response): Promise<Response>{
-        const users = await userService.findAll();
+    const professor = await userService.createProfessor({
+      name,
+      cpf,
+      email,
+      senha,
+      confirmarSenha,
+      dt_nascimento,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      aceite_lgpd,
+      photo,
+    });
 
-        return response.status(200).json(users);
+    return response.status(201).json(professor);
+  }
+
+  public async findAll(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const users = await userService.findAll();
+
+    return response.status(200).json(users);
+  }
+
+  public async update(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+    const { name, cpf } = request.body;
+
+    if (!id || typeof id !== "string") {
+      return response.status(400).json({
+        message: "Id Inválido",
+      });
     }
 
-    public async update(request: Request, response: Response): Promise<Response>{
-        const {id} = request.params;
-        const {name, cpf} = request.body;
+    const user = await userService.update(id, {
+      name,
+      cpf,
+    });
 
-        if(!id || typeof id !== "string"){
-            return response.status(400).json({
-                message: "Id Inválido"
-            });
-        }
+    return response.status(200).json(user);
+  }
 
-        const user = await userService.update(id, {
-            name,
-            cpf
-        });
+  public async updateOwnPhoto(
+    request: RequestAutenticado,
+    response: Response,
+  ): Promise<Response> {
+    const id = request.user?.id;
 
-        return response.status(200).json(user);
+    if (!id) {
+      return response.status(401).json({
+        message: "Usuário não autenticado",
+      });
     }
 
-    public async updateOwnPhoto(request: RequestAutenticado, response: Response): Promise<Response> {
-        const id = request.user?.id;
-
-        if(!id) {
-            return response.status(401).json({
-                message: "Usuário não autenticado"
-            });
-        }
-
-        if(!request.file) {
-            return response.status(400).json({
-                message: "Nenhuma imagem enviada"
-            });
-        }
-
-        const photo = `/storage/${request.file.filename}`;
-
-        const user = await userService.updateOwnPhoto(id, photo);
-
-        return response.status(200).json({
-            message: "Foto Atualizada com sucesso",
-            user
-        });
+    if (!request.file) {
+      return response.status(400).json({
+        message: "Nenhuma imagem enviada",
+      });
     }
 
-    public async findById(request: Request, response: Response): Promise<Response>{
-        const {id} = request.params;
+    const photo = `/storage/${request.file.filename}`;
 
-        if(!id || typeof id !== "string"){
-            return response.status(400).json({
-                message: "Id Inválido"
-            });
-        }
+    const user = await userService.updateOwnPhoto(id, photo);
 
-        const user = await userService.findById(id);
+    return response.status(200).json({
+      message: "Foto Atualizada com sucesso",
+      user,
+    });
+  }
 
-        return response.status(200).json(user);
+  public async findById(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { id } = request.params;
+
+    if (!id || typeof id !== "string") {
+      return response.status(400).json({
+        message: "Id Inválido",
+      });
     }
 
-    public async delete(request: Request, response: Response){
-        const {id} = request.params;
+    const user = await userService.findById(id);
 
-        if(!id || typeof id !== "string"){
-            return response.status(400).json({
-                message: "Id Inválido"
-            });
-        }
+    return response.status(200).json(user);
+  }
 
-        await userService.delete(id);
+  public async delete(request: Request, response: Response) {
+    const { id } = request.params;
 
-        return response.status(200).json({
-            message: "Usuário deletado com sucesso",
-        })
+    if (!id || typeof id !== "string") {
+      return response.status(400).json({
+        message: "Id Inválido",
+      });
     }
 
-    public async updateProfessor(request: Request, response: Response): Promise<Response> {
-        const { id } = request.params;
-        const {
-            name,
-            cpf,
-            email,
-            senha,
-            dt_nascimento,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            active
-        } = request.body ?? {};
+    await userService.delete(id);
 
-        if (!id || typeof id !== "string") {
-            return response.status(400).json({ message: "Id Inválido" });
-        }
+    return response.status(200).json({
+      message: "Usuário deletado com sucesso",
+    });
+  }
 
-        const professor = await userService.updateProfessor(id, {
-            name,
-            cpf,
-            email,
-            senha,
-            dt_nascimento,
-            estado_civil,
-            telefone_principal,
-            telefone_secundario,
-            active
-        });
+  public async updateProfessor(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { id } = request.params;
+    const {
+      name,
+      cpf,
+      email,
+      senha,
+      dt_nascimento,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      active,
+    } = request.body ?? {};
 
-        return response.status(200).json(professor);
+    if (!id || typeof id !== "string") {
+      return response.status(400).json({ message: "Id Inválido" });
     }
 
-    public async findAllProfessores(request: Request, response: Response): Promise<Response> {
-        const professores = await userService.findAllProfessores();
-        return response.status(200).json(professores);
+    const professor = await userService.updateProfessor(id, {
+      name,
+      cpf,
+      email,
+      senha,
+      dt_nascimento,
+      estado_civil,
+      telefone_principal,
+      telefone_secundario,
+      active,
+    });
+
+    return response.status(200).json(professor);
+  }
+
+  public async findAllProfessores(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const professores = await userService.findAllProfessores();
+    return response.status(200).json(professores);
+  }
+
+  public async inactivateProfessor(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { id } = request.params;
+
+    if (!id || typeof id !== "string") {
+      return response.status(400).json({ message: "Id Inválido" });
     }
 
-    public async inactivateProfessor(request: Request, response: Response): Promise<Response> {
-        const { id } = request.params;
+    const professor = await userService.inactivateProfessor(id);
 
-        if (!id || typeof id !== "string") {
-            return response.status(400).json({ message: "Id Inválido" });
-        }
-
-        const professor = await userService.inactivateProfessor(id);
-
-        return response.status(200).json({
-            message: "Professor inativado com sucesso",
-            professor
-        });
-    }
+    return response.status(200).json({
+      message: "Professor inativado com sucesso",
+      professor,
+    });
+  }
 }
 
-export default new UserController()
+export default new UserController();
