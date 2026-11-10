@@ -7,14 +7,14 @@ services:
     image: aticurando-frontend:1.0
 
     ports:
-      - "5173:80"
+      - "5173:8080"
 
     depends_on:
       api:
         condition: service_healthy
 
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/healthz || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/healthz || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

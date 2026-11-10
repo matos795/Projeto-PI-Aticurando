@@ -25,6 +25,7 @@ export interface IUser {
     updateAt?: string;
     passwordResetTokenHash?: string;
     passwordResetExpiresAt?: Date;
+    photo?: string | null;
 }
 
 export interface ICreateUserDTO {
@@ -58,4 +59,29 @@ export interface IUpdateUserDTO {
     profissao?: string;
     problemas_saude?: string;
     aceite_lgpd?: boolean;
+}
+
+export interface ICreateProfessorDTO {
+    name: string;
+    cpf: number;
+    email: string;
+    senha: string;
+    confirmarSenha: string;
+    dt_nascimento: string;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario?: string;
+    aceite_lgpd: boolean;
+}
+
+export interface IUpdateProfessorDTO {
+    name?: string;
+    cpf?: number;
+    email?: string;
+    senha?: string;
+    dt_nascimento?: string;
+    estado_civil?: string;
+    telefone_principal?: string;
+    telefone_secundario?: string;
+    active?: boolean;
 }
