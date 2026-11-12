@@ -4,6 +4,7 @@ import type { RequestAutenticado } from "../../types/request.types.js";
 
 class UserController {
     public async create(request: Request, response: Response): Promise<Response>{
+
         const {
             name, 
             cpf, 
@@ -43,6 +44,7 @@ class UserController {
     }
 
     public async createProfessor(request: Request, response: Response): Promise<Response>{
+         
         const {
             name,
             cpf,
@@ -59,6 +61,8 @@ class UserController {
         if (senha !== confirmarSenha) {
             return response.status(400).json({ message: "Senhas não coincidem" });
         }
+        console.log("Senha recebida:", senha);
+console.log("Confirmação recebida:", confirmarSenha);
 
         const professor = await userService.createProfessor({
             name,
