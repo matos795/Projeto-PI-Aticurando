@@ -2,6 +2,8 @@ import "dotenv/config";
 import User from "./user.model.js";
 import {
     Papel_usuario,
+    type ICreateProfessorDTO,
+    type IUpdateProfessorDTO,
     type IUpdateUserDTO
 } from "./user.types.js";
 import bcrypt from "bcryptjs";
@@ -157,6 +159,101 @@ class userService {
 
     public async delete(id: string) {
         return await User.findByIdAndDelete(id);
+    }
+
+    public async createProfessor (data: ICreateProfessorDTO){
+
+        if (data.senha !== data.confirmarSenha){
+            throw new AppError("As senhas não conferem", 400);
+        }
+
+        const emailExiste = await User.findOne({ email: data.email});
+        if (emailExiste){
+            throw new AppError("E-mail já cadastrado no sistema", 409);
+        }
+
+        const cpfExiste = await User.findOne({cpf: data.cpf});
+        if (cpfExiste){
+            throw new AppError("CPF já cadastrado no sistema", 409);
+        }
+
+        const senhaHash = await bcrypt.hash(data.senha,10);
+
+        const professor = await User.create({
+            name: data.name,
+            cpf: data.cpf,
+            email: data.email,
+            senhaHash,
+            dt_nascimento: data.dt_nascimento,
+            estado_civil: data.estado_civil,
+            telefone_principal: data.telefone_principal,
+            ...(data.telefone_secundario !== undefined && { telefone_secundario: data.telefone_secundario }),
+            papelUsuario: Papel_usuario.PROFESSOR,
+            active: true,
+            
+        });
+
+        return{
+            id: professor._id,
+            name: professor.name,
+            cpf: professor.cpf,
+            email: professor.email,
+            papelUsuario: professor.papelUsuario,
+            active: professor.active,
+        };
+    }
+
+    public async updateProfessor(id: string, data: IUpdateProfessorDTO) {
+
+        const professor = await User.findById(id);
+        if (!professor) {
+            throw new AppError("Usuário não encontrado", 404);
+        }
+        
+        if (professor.papelUsuario !== Papel_usuario.PROFESSOR) {
+            throw new AppError("O usuário informado não é um professor", 400);
+        }
+
+        const dadosAtualizados: any = { ...data };
+
+        if (data.senha) {
+            dadosAtualizados.senhaHash = await bcrypt.hash(data.senha, 10);
+            delete dadosAtualizados.senha; 
+        }
+
+        return await User.findByIdAndUpdate(id, dadosAtualizados, {
+            new: true,
+            runValidators: true,
+        });
+    }
+
+    public async findAllProfessores() {
+        return await User.find({ papelUsuario: Papel_usuario.PROFESSOR, active: true });
+    }
+
+    public async inactivateProfessor(id: string) {
+        const professor = await User.findById(id);
+
+        if (!professor) {
+            throw new AppError("Usuário não encontrado", 404);
+        }
+
+        if (professor.papelUsuario !== Papel_usuario.PROFESSOR) {
+            throw new AppError("O usuário informado não é um professor", 400);
+        }
+
+        if (!professor.active) {
+            throw new AppError("Este professor já está inativo", 400);
+        }
+
+        professor.active = false;
+        await professor.save();
+
+        return {
+            id: professor._id,
+            name: professor.name,
+            active: professor.active
+        };
     }
 }
 
