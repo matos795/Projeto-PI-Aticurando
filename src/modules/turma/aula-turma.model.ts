@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import type { IAulaTurma } from "./turma.types.js";
 import { StatusAula } from "./turma.types.js";
 
@@ -32,6 +32,14 @@ const aulaTurmaSchema = new Schema<IAulaTurma>(
             required: true,
             enum: Object.values(StatusAula),
             default: StatusAula.PENDENTE
+        },
+        finalizadaEm: {
+            type: Date,
+            required: false
+        },
+        finalizacaoAntecipada: {
+            type: Boolean,
+            default: false
         }
     },
     {
