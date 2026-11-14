@@ -1,17 +1,18 @@
 import type { Schema, Types } from "mongoose";
 import type { ICurso } from "../curso/curso.types.js";
 
-export enum Turno{
+export enum Turno {
     MANHA = "MANHA",
     TARDE = "TARDE",
-    NOITE = "NOITE"} ;
+    NOITE = "NOITE"
+};
 
 export enum StatusAula {
     PENDENTE = "PENDENTE",
     AGENDADA = "AGENDADA",
     REALIZADA = "REALIZADA",
     CANCELADA = "CANCELADA"
-} 
+}
 
 export interface IAulaTurma extends Document {
     aula: Types.ObjectId;
@@ -20,12 +21,14 @@ export interface IAulaTurma extends Document {
     dataFim: Date;
     professor: Types.ObjectId;
     status: StatusAula;
+    finalizadaEm?: Date;
+    finalizacaoAntecipada?: boolean;
 }
 
 export interface IUpdateAulaTurmaDTO {
     dataInicio?: Date;
     dataFim?: Date;
-    professor?: string; 
+    professor?: string;
     status?: StatusAula;
 }
 
@@ -45,7 +48,7 @@ export interface ICreateTurmaDTO {
     turno: Turno;
     dataInicio: string;
     dataFim: string;
-    curso: Schema.Types.ObjectId;  
+    curso: Schema.Types.ObjectId;
     active?: boolean;
 }
 
