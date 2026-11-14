@@ -12,4 +12,11 @@ professorRoutes.get(
     professorController.listarMinhasAulas
 );
 
+professorRoutes.get(
+    "/chamadas/resumo",
+    requireAuth,
+    authorizeRoles(Papel_usuario.PROFESSOR),
+    professorController.listarResumoChamadas
+);
+
 export default professorRoutes;

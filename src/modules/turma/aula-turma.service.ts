@@ -1,34 +1,34 @@
 import AulaTurma from "./aula-turma.model.js";
-import type { IUpdateAulaTurmaDTO } from "./turma.types.js";
+import { StatusAula, type IUpdateAulaTurmaDTO } from "./turma.types.js";
 import User from "../user/user.model.js";
 import { Papel_usuario } from "../user/user.types.js";
 import { AppError } from "../../errors/app-error.js";
 import Turma from "./turma.model.js";
 
-class AulaTurmaService{
-    public async findAllByTurma(turmaId: string){
-        return await AulaTurma.find({turma: turmaId})
+class AulaTurmaService {
+    public async findAllByTurma(turmaId: string) {
+        return await AulaTurma.find({ turma: turmaId })
             .populate("aula")
             .populate("professor", "name email");
     }
 
-    public async update (id: string, data: IUpdateAulaTurmaDTO){
+    public async update(id: string, data: IUpdateAulaTurmaDTO) {
 
         const ocorrencia = await AulaTurma.findById(id);
         if (!ocorrencia) {
             throw new AppError("Ocorrência de aula não encontrada.", 404);
         }
 
-        if (data.dataInicio || data.dataFim){
+        if (data.dataInicio || data.dataFim) {
             const turma = await Turma.findById(ocorrencia.turma)
 
-            if (!turma){
+            if (!turma) {
                 throw new AppError("Turma vinculada não encontrada.", 404);
             }
-            
+
             const aulaInicio = data.dataInicio ? new Date(data.dataInicio) : ocorrencia.dataInicio;
             const aulaFim = data.dataFim ? new Date(data.dataFim) : ocorrencia.dataFim;
-            
+
             const turmaInicio = new Date(turma.dataInicio);
             const turmaFim = new Date(turma.dataFim);
 
@@ -41,24 +41,31 @@ class AulaTurmaService{
             }
         }
 
+        if (data.status === StatusAula.REALIZADA) {
+            throw new AppError(
+                "Finalize a aula pelo fluxo de chamada do professor.",
+                400
+            );
+        }
+
         if (data.professor) {
             const professor = await User.findById(data.professor);
-            
+
             if (!professor) {
                 throw new Error("Usuário não encontrado.");
             }
-            
+
             if (professor.papelUsuario !== Papel_usuario.PROFESSOR) {
                 throw new Error("O usuário selecionado não possui permissão de PROFESSOR.");
             }
         }
-        
+
         return await AulaTurma.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
         })
-        .populate("aula")
-        .populate("professor", "name email")
+            .populate("aula")
+            .populate("professor", "name email")
     }
 }
 
