@@ -1,7 +1,6 @@
-import type { Response } from "express";
+import type { Response, NextFunction } from "express";
 import type { RequestAutenticado } from "../../types/request.types.js";
 import professorService from "./professor.service.js";
-import type { NextFunction } from "express";
 import { AppError } from "../../errors/app-error.js";
 
 class ProfessorController {

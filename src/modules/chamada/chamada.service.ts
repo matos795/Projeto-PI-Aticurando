@@ -1,13 +1,10 @@
-import { isValidObjectId } from "mongoose";
+import { isValidObjectId, Types } from "mongoose";
 
 import AulaTurma from "../turma/aula-turma.model.js";
 import Matricula from "../matricula/matricula.model.js";
 
 import { StatusMatricula } from "../matricula/matricula.types.js";
 import { AppError } from "../../errors/app-error.js";
-
-import { Types } from "mongoose";
-
 import Chamada from "./chamada.model.js";
 
 import { StatusPresenca } from "./chamada.types.js";
