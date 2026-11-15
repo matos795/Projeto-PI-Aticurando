@@ -4,6 +4,11 @@ import User from "../user/user.model.js";
 import { Papel_usuario } from "../user/user.types.js";
 import { AppError } from "../../errors/app-error.js";
 import Turma from "./turma.model.js";
+import { isValidObjectId } from "mongoose";
+import Matricula from "../matricula/matricula.model.js";
+import { StatusMatricula } from "../matricula/matricula.types.js";
+import Aula from "../aula/aula.model.js";
+import Curso from "../curso/curso.model.js";
 
 class AulaTurmaService {
     public async findAllByTurma(turmaId: string) {
@@ -67,6 +72,74 @@ class AulaTurmaService {
             .populate("aula")
             .populate("professor", "name email")
     }
+
+
+    public async buscarProximaAulaAluno(alunoId: string) {
+        if (!isValidObjectId(alunoId)) {
+            throw new AppError("Identificador inválido.", 400);
+        }
+
+        const matriculas = await Matricula.find({
+            user: alunoId,
+            status: StatusMatricula.APROVADA
+        })
+            .select("turma")
+            .lean();
+
+        if (matriculas.length === 0) {
+            return null;
+        }
+
+        const turmaIds = matriculas.map(
+            (matricula) => matricula.turma
+        );
+
+        const proximaAula = await AulaTurma.findOne({
+            turma: { $in: turmaIds },
+            status: StatusAula.AGENDADA,
+            dataInicio: { $gte: new Date() },
+            dataFim: { $ne: null }
+        })
+            .sort({ dataInicio: 1 })
+            .select("_id aula turma dataInicio dataFim")
+            .lean();
+
+        if (
+            !proximaAula ||
+            !proximaAula.dataInicio ||
+            !proximaAula.dataFim
+        ) {
+            return null;
+        }
+
+        const [aula, turma] = await Promise.all([
+            Aula.findById(proximaAula.aula)
+                .select("titulo")
+                .lean(),
+
+            Turma.findById(proximaAula.turma)
+                .select("curso turno")
+                .lean()
+        ]);
+
+        const curso = turma
+            ? await Curso.findById(turma.curso)
+                .select("name")
+                .lean()
+            : null;
+
+        return {
+            id: proximaAula._id.toString(),
+            titulo: aula?.titulo ?? "Aula",
+            turma: turma?.turno
+                ? `Turma - ${turma.turno}`
+                : "Turma não informada",
+            curso: curso?.name ?? "Curso não informado",
+            dataInicio: proximaAula.dataInicio.toISOString(),
+            dataFim: proximaAula.dataFim.toISOString()
+        };
+    }
+
 }
 
 export default new AulaTurmaService
