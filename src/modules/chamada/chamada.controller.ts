@@ -12,6 +12,35 @@ import { AppError } from "../../errors/app-error.js";
 
 class ChamadaController {
 
+
+    public async consultarMinhaFrequencia(
+        request: RequestAutenticado,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const alunoId = request.user?.id;
+
+            if (!alunoId) {
+                throw new AppError(
+                    "Usuário não autenticado.",
+                    401
+                );
+            }
+
+            const frequencias =
+                await chamadaService.calcularMinhaFrequencia(
+                    alunoId
+                );
+
+            response.status(200).json(frequencias);
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
     public async listarAlunos(
         request: RequestAutenticado,
         response: Response,

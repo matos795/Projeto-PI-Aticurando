@@ -5,6 +5,7 @@ import {
     requireAuth,
 } from "../../middlewares/auth.middleware.js";
 import { Papel_usuario } from "../user/user.types.js";
+import chamadaController from "../chamada/chamada.controller.js";
 
 const matriculaRoutes = Router();
 
@@ -27,6 +28,13 @@ matriculaRoutes.get(
     requireAuth,
     authorizeRoles(Papel_usuario.ALUNO),
     matriculaController.findByAluno,
+);
+
+matriculaRoutes.get(
+    "/minha-frequencia",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ALUNO),
+    chamadaController.consultarMinhaFrequencia
 );
 
 matriculaRoutes.get(

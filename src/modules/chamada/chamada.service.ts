@@ -17,6 +17,110 @@ import Aula from "../aula/aula.model.js";
 
 class ChamadaService {
 
+
+    public async calcularMinhaFrequencia(alunoId: string) {
+        if (!isValidObjectId(alunoId)) {
+            throw new AppError("Identificador inválido.", 400);
+        }
+        
+        const matriculas = await Matricula.find({
+            user: alunoId,
+            status: StatusMatricula.APROVADA
+        })
+            .select("_id turma")
+            .lean();
+
+        if (matriculas.length === 0) {
+            return [];
+        }
+
+        const turmaIds = matriculas.map(
+            (matricula) => matricula.turma
+        );
+
+        const aulasRealizadas = await AulaTurma.find({
+            turma: { $in: turmaIds },
+            status: StatusAula.REALIZADA
+        })
+            .select("_id turma")
+            .lean();
+
+        const turmaPorAula = new Map<string, string>(
+            aulasRealizadas.map((aula) => [
+                aula._id.toString(),
+                aula.turma.toString()
+            ])
+        );
+
+        const chamadas = await Chamada.find({
+            aulaTurma: {
+                $in: aulasRealizadas.map((aula) => aula._id)
+            }
+        })
+            .select("aulaTurma registros")
+            .lean();
+
+        type RegistroFrequencia = {
+            matriculaId: string;
+            turmaId: string;
+            presentes: number;
+            faltas: number;
+        };
+
+        const frequencias = new Map<string, RegistroFrequencia>(
+            matriculas.map((matricula) => [
+                matricula._id.toString(),
+                {
+                    matriculaId: matricula._id.toString(),
+                    turmaId: matricula.turma.toString(),
+                    presentes: 0,
+                    faltas: 0
+                }
+            ])
+        );
+
+        for (const chamada of chamadas) {
+            const turmaId = turmaPorAula.get(
+                chamada.aulaTurma.toString()
+            );
+
+            for (const registro of chamada.registros) {
+                const frequencia = frequencias.get(
+                    registro.matricula.toString()
+                );
+
+                if (!frequencia || frequencia.turmaId !== turmaId) {
+                    continue;
+                }
+
+                if (registro.status === StatusPresenca.PRESENTE) {
+                    frequencia.presentes++;
+                } else if (registro.status === StatusPresenca.FALTA) {
+                    frequencia.faltas++;
+                }
+            }
+        }
+
+        return Array.from(frequencias.values()).map((item) => {
+            const aulasContabilizadas =
+                item.presentes + item.faltas;
+
+            const frequenciaPercentual =
+                aulasContabilizadas > 0
+                    ? Math.round(
+                        (item.presentes / aulasContabilizadas) * 10000
+                    ) / 100
+                    : null;
+
+            return {
+                ...item,
+                aulasContabilizadas,
+                frequenciaPercentual
+            };
+        });
+    }
+
+
     public async listarAlunosDaAula(
         aulaTurmaId: string,
         professorId: string
