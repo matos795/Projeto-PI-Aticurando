@@ -105,9 +105,8 @@ class AulaTurmaService {
             .lean();
 
         if (
-            !proximaAula ||
-            !proximaAula.dataInicio ||
-            !proximaAula.dataFim
+            !proximaAula?.dataInicio ||
+            !proximaAula?.dataFim
         ) {
             return null;
         }

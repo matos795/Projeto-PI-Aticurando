@@ -1,7 +1,11 @@
-import type { Request, Response } from "express";
+import type {
+    Request,
+    Response,
+    NextFunction
+} from "express";
+
 import aulaTurmaService from "./aula-turma.service.js";
 import type { RequestAutenticado } from "../../types/request.types.js";
-import type { NextFunction } from "express";
 import { AppError } from "../../errors/app-error.js";
 
 class AulaTurmaController {
@@ -15,8 +19,12 @@ class AulaTurmaController {
 
             const agenda = await aulaTurmaService.findAllByTurma(turmaId);
             return res.status(200).json(agenda);
-        } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+        } catch (error: unknown) {
+            return res.status(400).json({
+                error: error instanceof Error
+                    ? error.message
+                    : "Ocorreu um erro inesperado."
+            });
         }
     }
 
@@ -36,8 +44,12 @@ class AulaTurmaController {
             }
 
             return res.status(200).json(ocorrenciaAtualizada);
-        } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+        } catch (error: unknown) {
+            return res.status(400).json({
+                error: error instanceof Error
+                    ? error.message
+                    : "Ocorreu um erro inesperado."
+            });
         }
     }
 
