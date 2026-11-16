@@ -9,7 +9,7 @@ const turmaRoutes = Router();
 turmaRoutes.get("/:turmaId/agenda", requireAuth,
     authorizeRoles(Papel_usuario.ADM),
     aulaTurmaController.findAllByTurma);
-    
+
 turmaRoutes.put("/agenda/:id", requireAuth,
     authorizeRoles(Papel_usuario.ADM),
     aulaTurmaController.update);
@@ -24,6 +24,12 @@ turmaRoutes.get(
     "/",
     requireAuth,
     turmaController.findAll
+);
+turmaRoutes.get(
+    "/minha-proxima-aula",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ALUNO),
+    aulaTurmaController.minhaProximaAula
 );
 turmaRoutes.get(
     "/:id",

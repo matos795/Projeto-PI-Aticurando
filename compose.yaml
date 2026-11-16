@@ -36,9 +36,12 @@ services:
     env_file:
       - .env
 
+    volumes:
+      - uploads_data:/app/storage
+
     environment:
       PORT: 3002
-      MONGO_URI: mongodb://mongo:27017/aticurando
+      MONGODB_URI: mongodb://mongo:27017/aticurando
 
     depends_on:
       mongo:
@@ -75,6 +78,6 @@ services:
 
     restart: unless-stopped
 
-
 volumes:
   mongo_data:
+  uploads_data:
