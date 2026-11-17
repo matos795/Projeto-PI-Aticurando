@@ -43,6 +43,9 @@ class UserController {
     }
 
     public async createProfessor(request: Request, response: Response): Promise<Response>{
+        console.log("BODY:", request.body);
+        
+        
         const {
             name,
             cpf,

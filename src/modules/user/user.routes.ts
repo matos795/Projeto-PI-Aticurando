@@ -6,10 +6,12 @@ import { upload } from "../../config/upload.js";
 
 const userRoutes = Router();
 
+
 userRoutes.post(
     "/professor",
     requireAuth,
     authorizeRoles(Papel_usuario.ADM),
+    upload.single("photo"),
     userController.createProfessor
 );
 
