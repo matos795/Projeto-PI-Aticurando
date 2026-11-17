@@ -190,6 +190,7 @@ class userService {
             ...(data.telefone_secundario !== undefined && { telefone_secundario: data.telefone_secundario }),
             papelUsuario: Papel_usuario.PROFESSOR,
             active: true,
+            aceite_lgpd: data.aceite_lgpd,
             
         });
 
