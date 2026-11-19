@@ -1,5 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import type { IAula } from '../aula/aula.types.js';
+import type { IAula } from '../aula/aula.types.js';
+import type { IAula } from '../aula/aula.types.js';
+import type { IAula } from '../aula/aula.types.js';
 
 const aulaSchema = new Schema<IAula>(
     {

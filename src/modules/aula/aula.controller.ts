@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import aulaService from "./aula.service.js";
+import aulaService from "./aula.service.js";
+import type { Request, Response } from "express";
 
 class AulaController {
     public async create(req: Request, res: Response){
