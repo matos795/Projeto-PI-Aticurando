@@ -22,7 +22,7 @@ class MatriculaController {
                     message: "Turma é obrigatória",
                 });
             }
-            
+
             const matricula = await matriculaService.create({
                 user: userId,
                 turma,
@@ -157,56 +157,32 @@ class MatriculaController {
         response: Response,
     ): Promise<Response> {
         try {
-        const { id } = request.params;
+            const { id } = request.params;
 
-        if (!id || typeof id !== "string") {
-            return response.status(400).json({
-                message: "ID inválido",
-            });
-        }
-    
-        const matricula = await matriculaService.aprovarMatricula(id);
+            if (!id || typeof id !== "string") {
+                return response.status(400).json({
+                    message: "ID inválido",
+                });
+            }
 
-        return response.status(200).json(matricula);
+            const matricula = await matriculaService.aprovarMatricula(id);
+
+            return response.status(200).json(matricula);
 
         } catch (error) {
-        return response.status(400).json({
-            message:
-                error instanceof Error
-                    ? error.message
-                    : "Erro ao aprovar matrícula",
-        });
+            return response.status(400).json({
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Erro ao aprovar matrícula",
+            });
         }
-        }
-    
+    }
+
     public async recusarMatricula(
         request: Request,
         response: Response,
     ): Promise<Response> {
-        try {
-        const { id } = request.params;
-
-        if (!id || typeof id !== "string") {
-            return response.status(400).json({
-                message: "ID inválido",
-            });
-        }
-
-        const matricula = await matriculaService.recusarMatricula(id);
-
-        return response.status(200).json(matricula);
-
-        } catch (error) {
-        return response.status(400).json({
-            message:
-                error instanceof Error
-                    ? error.message
-                    : "Erro ao recusar matrícula",
-        });
-        }
-    }
-
-    public async cancelarMatricula(request: Request, response: Response): Promise<Response>{
         try {
             const { id } = request.params;
 
@@ -216,15 +192,56 @@ class MatriculaController {
                 });
             }
 
-            const matricula = await matriculaService.cancelarMatricula(id, request.body.motivoCancelamento);
+            const matricula = await matriculaService.recusarMatricula(id);
 
             return response.status(200).json(matricula);
+
         } catch (error) {
             return response.status(400).json({
                 message:
                     error instanceof Error
                         ? error.message
-                        : "Erro ao cancelar matrícula",
+                        : "Erro ao recusar matrícula",
+            });
+        }
+    }
+
+
+    public async cancelarMatricula(
+        request: RequestAutenticado,
+        response: Response
+    ): Promise<Response> {
+        try {
+            const { id } = request.params;
+            const alunoId = request.user?.id;
+
+            if (!alunoId) {
+                return response.status(401).json({
+                    message: "Usuário não autenticado"
+                });
+            }
+
+            if (!id || typeof id !== "string") {
+                return response.status(400).json({
+                    message: "ID inválido"
+                });
+            }
+
+            const matricula =
+                await matriculaService.cancelarMatricula(
+                    id,
+                    alunoId,
+                    request.body?.motivoCancelamento
+                );
+
+            return response.status(200).json(matricula);
+
+        } catch (error) {
+            return response.status(400).json({
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Erro ao cancelar matrícula"
             });
         }
     }

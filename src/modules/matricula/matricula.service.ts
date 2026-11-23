@@ -203,7 +203,7 @@ class MatriculaService {
         ]);
     }
 
-    public async recusarMatricula(id: string){
+    public async recusarMatricula(id: string) {
         const matricula = await Matricula.findById(id);
 
         if (!matricula) {
@@ -232,18 +232,37 @@ class MatriculaService {
         ]);
     }
 
-    public async cancelarMatricula(id: string, motivoCancelamento: string) {
-        const matricula = await Matricula.findById(id);
+    public async cancelarMatricula(
+        id: string,
+        alunoId: string,
+        motivoCancelamento: string
+    ) {
+        const matricula = await Matricula.findOne({
+            _id: id,
+            user: alunoId
+        });
 
         if (!matricula) {
-            throw new Error("Matrícula não encontrada");
+            throw new Error(
+                "Matrícula não encontrada para este aluno"
+            );
         }
 
-        if (matricula.status !== StatusMatricula.APROVADA){
+        if (matricula.status !== StatusMatricula.APROVADA) {
             throw new Error("Apenas matrículas aprovadas podem ser canceladas");
         }
         matricula.status = StatusMatricula.CANCELADA;
-        matricula.motivoCancelamento = motivoCancelamento;
+
+        if (
+            typeof motivoCancelamento !== "string" ||
+            !motivoCancelamento.trim()
+        ) {
+            throw new Error(
+                "Informe o motivo do cancelamento"
+            );
+        }
+
+        matricula.motivoCancelamento = motivoCancelamento.trim();
 
         await matricula.save();
 
@@ -259,9 +278,9 @@ class MatriculaService {
                 },
             },
         ]);
-    
+
     }
 
-    
+
 }
 export default new MatriculaService();
