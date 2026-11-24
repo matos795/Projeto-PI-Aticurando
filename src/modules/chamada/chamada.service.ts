@@ -17,12 +17,11 @@ import Aula from "../aula/aula.model.js";
 
 class ChamadaService {
 
-
     public async calcularMinhaFrequencia(alunoId: string) {
         if (!isValidObjectId(alunoId)) {
             throw new AppError("Identificador inválido.", 400);
         }
-        
+
         const matriculas = await Matricula.find({
             user: alunoId,
             status: StatusMatricula.APROVADA
@@ -182,13 +181,10 @@ class ChamadaService {
             );
         }
 
-        if (
-            aulaTurma.status !== "AGENDADA" &&
-            aulaTurma.status !== "REALIZADA"
-        ) {
+        if (aulaTurma.status !== StatusAula.AGENDADA) {
             throw new AppError(
-                "Esta aula não permite registro de chamada.",
-                400
+                "A chamada de uma aula finalizada não pode ser alterada.",
+                409
             );
         }
 

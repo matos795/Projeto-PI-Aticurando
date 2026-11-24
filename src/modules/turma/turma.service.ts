@@ -30,10 +30,10 @@ class TurmaService {
         const materiaIds = curso.materias.map((item: any) => item.materia);
 
         if (materiaIds.length > 0) {
-            const aulas = await Aula.find({materiaId: {$in: materiaIds}});
+            const aulas = await Aula.find({ materiaId: { $in: materiaIds } });
 
-            const ocorrencias = aulas.map((aula) =>{
-                return{
+            const ocorrencias = aulas.map((aula) => {
+                return {
                     aula: aula._id,
                     turma: turma._id,
                     status: StatusAula.PENDENTE
@@ -42,14 +42,16 @@ class TurmaService {
 
             if (ocorrencias.length > 0) {
                 await AulaTurma.insertMany(ocorrencias);
-            }   
+            }
         }
 
         return await turma.populate("curso");
     }
 
-    public async findAll() {
-        const turmas = await Turma.find({active: true}).populate("curso");
+    public async findAll(incluirInativas = false) {
+        const turmas = await Turma.find(
+            incluirInativas ? {} : { active: true }
+        ).populate("curso");
 
         const turmasMatricula: ITurmaMatricula[] = [];
 
@@ -83,7 +85,7 @@ class TurmaService {
             if (data.dataInicio && data.dataFim && new Date(data.dataInicio) >= new Date(data.dataFim)) {
                 throw new Error("Data de início deve ser anterior à data de fim");
             }
-        
+
         }
 
         const updateData: any = {};

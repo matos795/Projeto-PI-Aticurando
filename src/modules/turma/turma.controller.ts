@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import turmaService from "./turma.service.js";
+import type { RequestAutenticado } from "../../types/request.types.js";
+import { Papel_usuario } from "../user/user.types.js";
 
 class TurmaController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -22,8 +24,16 @@ class TurmaController {
             });
         }
     }
-public async findAll(request: Request, response: Response): Promise<Response> {
-        const turmas = await turmaService.findAll();
+
+    public async findAll(
+        request: RequestAutenticado,
+        response: Response
+    ): Promise<Response> {
+        const incluirInativas =
+            request.query.incluirInativas === "true" &&
+            request.user?.papelUsuario === Papel_usuario.ADM;
+
+        const turmas = await turmaService.findAll(incluirInativas);
 
         return response.status(200).json(turmas);
     }
