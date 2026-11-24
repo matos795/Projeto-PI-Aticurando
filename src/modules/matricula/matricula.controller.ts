@@ -90,43 +90,6 @@ class MatriculaController {
         return response.status(200).json(matricula);
     }
 
-    public async update(
-        request: Request,
-        response: Response,
-    ): Promise<Response> {
-        try {
-            const { id } = request.params;
-            const { frequencia, status, motivoCancelamento } = request.body;
-
-            if (!id || typeof id !== "string") {
-                return response.status(400).json({
-                    message: "ID inválido",
-                });
-            }
-
-            const matricula = await matriculaService.update(id, {
-                frequencia,
-                status,
-                motivoCancelamento,
-            });
-
-            if (!matricula) {
-                return response.status(404).json({
-                    message: "Matrícula não encontrada",
-                });
-            }
-
-            return response.status(200).json(matricula);
-        } catch (error) {
-            return response.status(400).json({
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : "Erro ao atualizar matrícula",
-            });
-        }
-    }
-
     public async delete(
         request: Request,
         response: Response,

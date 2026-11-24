@@ -26,10 +26,3 @@ export interface ICreateMatriculaDTO{
     interesseServicos: string[];
     comoSoubeCurso: string;
 }
-
-export interface IUpdateMatriculaDTO{
-    frequencia?: number;
-    status?: StatusMatricula;
-    motivoCancelamento?: string;
-    comoSoubeCurso?: string;
-}
