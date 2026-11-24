@@ -130,12 +130,13 @@ export function gerarCertificadoPdf(
                     }
                 );
 
-            const tamanhoNome =
-                certificado.nomeAluno.length > 42
-                    ? 19
-                    : certificado.nomeAluno.length > 30
-                        ? 23
-                        : 29;
+            let tamanhoNome = 29;
+
+            if (certificado.nomeAluno.length > 42) {
+                tamanhoNome = 19;
+            } else if (certificado.nomeAluno.length > 30) {
+                tamanhoNome = 23;
+            }
 
             doc.font("Helvetica-Bold")
                 .fontSize(tamanhoNome)

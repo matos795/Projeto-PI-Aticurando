@@ -27,6 +27,135 @@ interface ResumoPresenca {
     registrosDuplicados: boolean;
 }
 
+interface MatriculaParaCertificado {
+    _id: Types.ObjectId;
+    user: Types.ObjectId;
+}
+
+interface ChamadaParaCertificado {
+    aulaTurma: Types.ObjectId;
+    registros: Array<{
+        matricula: Types.ObjectId;
+        status: StatusPresenca;
+    }>;
+}
+
+interface UsuarioParaCertificado {
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+}
+
+function consolidarPresencas(
+    matriculas: MatriculaParaCertificado[],
+    chamadas: ChamadaParaCertificado[]
+): Map<string, ResumoPresenca> {
+    const frequencias = new Map<string, ResumoPresenca>(
+        matriculas.map((matricula) => [
+            matricula._id.toString(),
+            {
+                presentes: 0,
+                faltas: 0,
+                aulasRegistradas: new Set<string>(),
+                registrosDuplicados: false
+            }
+        ])
+    );
+
+    for (const chamada of chamadas) {
+        const aulaId = chamada.aulaTurma.toString();
+
+        for (const registro of chamada.registros) {
+            const resumo = frequencias.get(registro.matricula.toString());
+            if (!resumo) continue;
+
+            if (resumo.aulasRegistradas.has(aulaId)) {
+                resumo.registrosDuplicados = true;
+                continue;
+            }
+
+            if (
+                registro.status !== StatusPresenca.PRESENTE &&
+                registro.status !== StatusPresenca.FALTA
+            ) {
+                resumo.registrosDuplicados = true;
+                continue;
+            }
+
+            resumo.aulasRegistradas.add(aulaId);
+            if (registro.status === StatusPresenca.PRESENTE) {
+                resumo.presentes++;
+            } else {
+                resumo.faltas++;
+            }
+        }
+    }
+
+    return frequencias;
+}
+
+function avaliarAlunosParaCertificado(
+    matriculas: MatriculaParaCertificado[],
+    usuarios: UsuarioParaCertificado[],
+    frequencias: Map<string, ResumoPresenca>,
+    turmaConcluida: boolean,
+    aulasObrigatorias: number
+) {
+    const usuariosPorId = new Map(
+        usuarios.map((usuario) => [usuario._id.toString(), usuario])
+    );
+
+    return matriculas.map((matricula) => {
+        const matriculaId = matricula._id.toString();
+        const alunoId = matricula.user.toString();
+        const usuario = usuariosPorId.get(alunoId);
+        const resumo = frequencias.get(matriculaId);
+
+        const presentes = resumo?.presentes ?? 0;
+        const faltas = resumo?.faltas ?? 0;
+        const aulasContabilizadas = presentes + faltas;
+        const frequenciaPercentual = aulasContabilizadas > 0
+            ? Math.round((presentes / aulasContabilizadas) * 10000) / 100
+            : null;
+
+        const registrosCompletos =
+            !resumo?.registrosDuplicados &&
+            resumo?.aulasRegistradas.size === aulasObrigatorias;
+
+        const motivos: string[] = [];
+        if (!turmaConcluida) {
+            motivos.push(
+                'A turma ainda não concluiu todas as aulas obrigatórias ou possui dados acadêmicos incompletos.'
+            );
+        }
+        if (!usuario) {
+            motivos.push('Dados do aluno não encontrados.');
+        }
+        if (!registrosCompletos) {
+            motivos.push('O aluno não possui registros válidos em todas as aulas obrigatórias.');
+        }
+        if (
+            frequenciaPercentual === null ||
+            frequenciaPercentual < FREQUENCIA_MINIMA_CERTIFICADO
+        ) {
+            motivos.push(`Frequência inferior ao mínimo de ${FREQUENCIA_MINIMA_CERTIFICADO}%.`);
+        }
+
+        return {
+            matriculaId,
+            alunoId,
+            nome: usuario?.name ?? 'Aluno não encontrado',
+            email: usuario?.email ?? null,
+            presentes,
+            faltas,
+            aulasContabilizadas,
+            frequenciaPercentual,
+            elegivel: motivos.length === 0,
+            motivos
+        };
+    });
+}
+
 class CertificadoService {
     public async consultarElegibilidade(turmaId: string) {
         if (!isValidObjectId(turmaId)) {
@@ -138,16 +267,9 @@ class CertificadoService {
             chamadasRegistradas &&
             cargaHorariaValida;
 
-        const frequencias = new Map<string, ResumoPresenca>(
-            matriculas.map((matricula) => [
-                matricula._id.toString(),
-                {
-                    presentes: 0,
-                    faltas: 0,
-                    aulasRegistradas: new Set<string>(),
-                    registrosDuplicados: false
-                }
-            ])
+        const frequencias = consolidarPresencas(
+            matriculas,
+            chamadas
         );
 
         for (const chamada of chamadas) {
@@ -191,72 +313,13 @@ class CertificadoService {
             ])
         );
 
-        const alunos = matriculas.map((matricula) => {
-            const matriculaId = matricula._id.toString();
-            const alunoId = matricula.user.toString();
-
-            const usuario = usuariosPorId.get(alunoId);
-
-            const resumo = frequencias.get(matriculaId);
-
-            const presentes = resumo?.presentes ?? 0;
-            const faltas = resumo?.faltas ?? 0;
-
-            const aulasContabilizadas = presentes + faltas;
-
-            const frequenciaPercentual =
-                aulasContabilizadas > 0
-                    ? Math.round(
-                        (presentes / aulasContabilizadas) * 10000
-                    ) / 100
-                    : null;
-
-            const registrosCompletos =
-                !resumo?.registrosDuplicados &&
-                resumo?.aulasRegistradas.size === obrigatorias.length;
-
-            const motivos: string[] = [];
-
-            if (!turmaConcluida) {
-                motivos.push(
-                    "A turma ainda não concluiu todas as aulas obrigatórias ou possui dados acadêmicos incompletos."
-                );
-            }
-
-            if (!usuario) {
-                motivos.push(
-                    "Dados do aluno não encontrados."
-                );
-            }
-
-            if (!registrosCompletos) {
-                motivos.push(
-                    "O aluno não possui registros válidos em todas as aulas obrigatórias."
-                );
-            }
-
-            if (
-                frequenciaPercentual === null ||
-                frequenciaPercentual < FREQUENCIA_MINIMA_CERTIFICADO
-            ) {
-                motivos.push(
-                    `Frequência inferior ao mínimo de ${FREQUENCIA_MINIMA_CERTIFICADO}%.`
-                );
-            }
-
-            return {
-                matriculaId,
-                alunoId,
-                nome: usuario?.name ?? "Aluno não encontrado",
-                email: usuario?.email ?? null,
-                presentes,
-                faltas,
-                aulasContabilizadas,
-                frequenciaPercentual,
-                elegivel: motivos.length === 0,
-                motivos
-            };
-        });
+        const alunos = avaliarAlunosParaCertificado(
+            matriculas,
+            usuarios,
+            frequencias,
+            turmaConcluida,
+            obrigatorias.length
+        );
 
         alunos.sort((a, b) =>
             a.nome.localeCompare(b.nome, "pt-BR")
@@ -411,12 +474,7 @@ class CertificadoService {
             };
 
         } catch (error) {
-            if (
-                error !== null &&
-                typeof error === "object" &&
-                "code" in error &&
-                error.code === 11000
-            ) {
+            if ((error as { code?: number } | null)?.code === 11000) {
                 const emitido = await Certificado.findOne({
                     matricula: matriculaId
                 });
@@ -470,7 +528,7 @@ class CertificadoService {
             .lean();
     }
 
-    public async listarMeus(alunoId: string) {
+    public listarMeus(alunoId: string) {
         if (!isValidObjectId(alunoId)) {
             throw new AppError(
                 "Identificador do aluno inválido.",
