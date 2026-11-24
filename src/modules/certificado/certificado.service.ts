@@ -46,6 +46,37 @@ interface UsuarioParaCertificado {
     email: string;
 }
 
+function registrarPresenca(
+    resumo: ResumoPresenca | undefined,
+    aulaId: string,
+    status: StatusPresenca
+): void {
+    if (!resumo) {
+        return;
+    }
+
+    if (resumo.aulasRegistradas.has(aulaId)) {
+        resumo.registrosDuplicados = true;
+        return;
+    }
+
+    if (
+        status !== StatusPresenca.PRESENTE &&
+        status !== StatusPresenca.FALTA
+    ) {
+        resumo.registrosDuplicados = true;
+        return;
+    }
+
+    resumo.aulasRegistradas.add(aulaId);
+
+    if (status === StatusPresenca.PRESENTE) {
+        resumo.presentes++;
+    } else {
+        resumo.faltas++;
+    }
+}
+
 function consolidarPresencas(
     matriculas: MatriculaParaCertificado[],
     chamadas: ChamadaParaCertificado[]
@@ -66,28 +97,15 @@ function consolidarPresencas(
         const aulaId = chamada.aulaTurma.toString();
 
         for (const registro of chamada.registros) {
-            const resumo = frequencias.get(registro.matricula.toString());
-            if (!resumo) continue;
+            const resumo = frequencias.get(
+                registro.matricula.toString()
+            );
 
-            if (resumo.aulasRegistradas.has(aulaId)) {
-                resumo.registrosDuplicados = true;
-                continue;
-            }
-
-            if (
-                registro.status !== StatusPresenca.PRESENTE &&
-                registro.status !== StatusPresenca.FALTA
-            ) {
-                resumo.registrosDuplicados = true;
-                continue;
-            }
-
-            resumo.aulasRegistradas.add(aulaId);
-            if (registro.status === StatusPresenca.PRESENTE) {
-                resumo.presentes++;
-            } else {
-                resumo.faltas++;
-            }
+            registrarPresenca(
+                resumo,
+                aulaId,
+                registro.status
+            );
         }
     }
 
@@ -270,47 +288,6 @@ class CertificadoService {
         const frequencias = consolidarPresencas(
             matriculas,
             chamadas
-        );
-
-        for (const chamada of chamadas) {
-            const aulaId = chamada.aulaTurma.toString();
-
-            for (const registro of chamada.registros) {
-                const matriculaId = registro.matricula.toString();
-                const resumo = frequencias.get(matriculaId);
-
-                if (!resumo) {
-                    continue;
-                }
-
-                if (resumo.aulasRegistradas.has(aulaId)) {
-                    resumo.registrosDuplicados = true;
-                    continue;
-                }
-
-                if (
-                    registro.status !== StatusPresenca.PRESENTE &&
-                    registro.status !== StatusPresenca.FALTA
-                ) {
-                    resumo.registrosDuplicados = true;
-                    continue;
-                }
-
-                resumo.aulasRegistradas.add(aulaId);
-
-                if (registro.status === StatusPresenca.PRESENTE) {
-                    resumo.presentes++;
-                } else {
-                    resumo.faltas++;
-                }
-            }
-        }
-
-        const usuariosPorId = new Map(
-            usuarios.map((usuario) => [
-                usuario._id.toString(),
-                usuario
-            ])
         );
 
         const alunos = avaliarAlunosParaCertificado(
