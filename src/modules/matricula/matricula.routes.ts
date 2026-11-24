@@ -44,13 +44,6 @@ matriculaRoutes.get(
     matriculaController.findById,
 );
 
-matriculaRoutes.put(
-    "/:id",
-    requireAuth,
-    authorizeRoles(Papel_usuario.ADM),
-    matriculaController.update,
-);
-
 matriculaRoutes.delete(
     "/:id",
     requireAuth,

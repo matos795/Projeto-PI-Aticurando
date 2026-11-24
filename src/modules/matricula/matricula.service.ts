@@ -5,7 +5,6 @@ import Matricula from "./matricula.model.js";
 import {
     StatusMatricula,
     type ICreateMatriculaDTO,
-    type IUpdateMatriculaDTO,
 } from "./matricula.types.js";
 
 class MatriculaService {
@@ -117,43 +116,9 @@ class MatriculaService {
         ]);
     }
 
-    public async update(id: string, data: IUpdateMatriculaDTO) {
-        const updateData: IUpdateMatriculaDTO = {};
-
-        if (data.frequencia !== undefined) {
-            updateData.frequencia = data.frequencia;
-        }
-
-        if (data.status !== undefined) {
-            updateData.status = data.status;
-        }
-
-        if (data.motivoCancelamento !== undefined) {
-            updateData.motivoCancelamento = data.motivoCancelamento;
-        }
-
-        return await Matricula.findByIdAndUpdate(id, updateData, {
-            new: true,
-            runValidators: true,
-        }).populate([
-            {
-                path: "user",
-                select: "name cpf email papelUsuario active",
-            },
-            {
-                path: "turma",
-                populate: {
-                    path: "curso",
-                },
-            },
-        ]);
-    }
-
     public async delete(id: string) {
         return await Matricula.findByIdAndDelete(id);
     }
-
-
 
     public async aprovarMatricula(id: string) {
         const matricula = await Matricula.findById(id);
