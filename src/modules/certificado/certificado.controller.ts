@@ -11,6 +11,7 @@ import type {
 } from "../../types/request.types.js";
 
 import { AppError } from "../../errors/app-error.js";
+import { gerarCertificadoPdf } from "./certificado.pdf.js";
 
 class CertificadoController {
     public async consultarElegibilidade(
@@ -82,6 +83,131 @@ class CertificadoController {
                     certificado.frequenciaPercentual,
                 emitidoEm: certificado.emitidoEm
             });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    public async listarEmitidosDaTurma(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const turmaId = request.params.turmaId;
+
+            if (typeof turmaId !== "string") {
+                throw new AppError("Turma inválida.", 400);
+            }
+
+            const certificados =
+                await certificadoService.listarEmitidosDaTurma(
+                    turmaId
+                );
+
+            response.status(200).json(certificados);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async listarMeus(
+        request: RequestAutenticado,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const alunoId = request.user?.id;
+
+            if (!alunoId) {
+                throw new AppError(
+                    "Aluno não autenticado.",
+                    401
+                );
+            }
+
+            const certificados =
+                await certificadoService.listarMeus(alunoId);
+
+            response.status(200).json(certificados);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async baixarPdf(
+        request: RequestAutenticado,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const certificadoId = request.params.id;
+            const usuario = request.user;
+
+            if (
+                typeof certificadoId !== "string" ||
+                !usuario
+            ) {
+                throw new AppError(
+                    "Requisição não autorizada ou inválida.",
+                    401
+                );
+            }
+
+            const certificado =
+                await certificadoService.obterParaDownload(
+                    certificadoId,
+                    usuario.id,
+                    usuario.papelUsuario
+                );
+
+            const pdf = await gerarCertificadoPdf(certificado);
+
+            response.setHeader(
+                "Content-Type",
+                "application/pdf"
+            );
+
+            response.setHeader(
+                "Content-Disposition",
+                `attachment; filename="certificado-${certificado.codigoVerificacao}.pdf"`
+            );
+
+            response.setHeader(
+                "Cache-Control",
+                "private, no-store"
+            );
+
+            response.status(200).send(pdf);
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async validarAutenticidade(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const codigo = request.params.codigo;
+
+            if (typeof codigo !== "string") {
+                throw new AppError(
+                    "Código inválido.",
+                    400
+                );
+            }
+
+            const resultado =
+                await certificadoService.validarAutenticidade(
+                    codigo
+                );
+
+            response.status(200).json(resultado);
 
         } catch (error) {
             next(error);

@@ -11,6 +11,7 @@ import User from "../user/user.model.js";
 
 import { randomBytes } from "node:crypto";
 import Certificado from "./certificado.model.js";
+import { Papel_usuario } from "../user/user.types.js";
 
 import { StatusAula } from "../turma/turma.types.js";
 import { StatusMatricula } from "../matricula/matricula.types.js";
@@ -435,6 +436,143 @@ class CertificadoService {
 
             throw error;
         }
+    }
+
+
+    public async listarEmitidosDaTurma(turmaId: string) {
+        if (!isValidObjectId(turmaId)) {
+            throw new AppError(
+                "Identificador da turma inválido.",
+                400
+            );
+        }
+
+        const turmaExiste = await Turma.exists({
+            _id: turmaId
+        });
+
+        if (!turmaExiste) {
+            throw new AppError(
+                "Turma não encontrada.",
+                404
+            );
+        }
+
+        return Certificado.find({
+            turma: turmaId
+        })
+            .select(
+                "_id matricula aluno nomeAluno nomeCurso " +
+                "cargaHorariaMinutos frequenciaPercentual " +
+                "codigoVerificacao emitidoEm"
+            )
+            .sort({ emitidoEm: -1 })
+            .lean();
+    }
+
+    public async listarMeus(alunoId: string) {
+        if (!isValidObjectId(alunoId)) {
+            throw new AppError(
+                "Identificador do aluno inválido.",
+                400
+            );
+        }
+
+        return Certificado.find({
+            aluno: alunoId
+        })
+            .select(
+                "_id nomeAluno nomeCurso turno " +
+                "periodoInicio periodoFim " +
+                "cargaHorariaMinutos frequenciaPercentual " +
+                "codigoVerificacao emitidoEm"
+            )
+            .sort({ emitidoEm: -1 })
+            .lean();
+    }
+
+    public async obterParaDownload(
+        certificadoId: string,
+        usuarioId: string,
+        papelUsuario: Papel_usuario
+    ) {
+        if (
+            !isValidObjectId(certificadoId) ||
+            !isValidObjectId(usuarioId)
+        ) {
+            throw new AppError(
+                "Identificador inválido.",
+                400
+            );
+        }
+
+        if (
+            papelUsuario !== Papel_usuario.ADM &&
+            papelUsuario !== Papel_usuario.ALUNO
+        ) {
+            throw new AppError(
+                "Acesso não autorizado.",
+                403
+            );
+        }
+
+        const certificado = await Certificado.findById(
+            certificadoId
+        ).lean();
+
+        if (!certificado) {
+            throw new AppError(
+                "Certificado não encontrado.",
+                404
+            );
+        }
+
+        // Alunos só podem baixar os próprios certificados
+        if (
+            papelUsuario === Papel_usuario.ALUNO &&
+            certificado.aluno.toString() !== usuarioId
+        ) {
+            throw new AppError(
+                "Certificado não encontrado.",
+                404
+            );
+        }
+
+        return certificado;
+    }
+
+    public async validarAutenticidade(codigoRecebido: string) {
+        const codigo = codigoRecebido.trim().toUpperCase();
+
+        // randomBytes(16) gera 32 caracteres hexadecimais
+        if (!/^[A-F0-9]{32}$/.test(codigo)) {
+            return { valido: false };
+        }
+
+        const certificado = await Certificado.findOne({
+            codigoVerificacao: codigo
+        })
+            .select(
+                "nomeAluno nomeCurso cargaHorariaMinutos " +
+                "codigoVerificacao emitidoEm"
+            )
+            .lean();
+
+        if (!certificado) {
+            return { valido: false };
+        }
+
+        return {
+            valido: true,
+            codigoVerificacao: certificado.codigoVerificacao,
+            nomeAluno: certificado.nomeAluno,
+            nomeCurso: certificado.nomeCurso,
+            cargaHorariaHoras:
+                Math.round(
+                    (certificado.cargaHorariaMinutos / 60) * 100
+                ) / 100,
+            emitidoEm: certificado.emitidoEm
+        };
     }
 }
 
