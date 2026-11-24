@@ -10,6 +10,7 @@ import aulaRoutes from "./modules/aula/aula.routes.js";
 import mongoose from "mongoose";
 import professorRoutes from "./modules/professor/professor.routes.js";
 import chamadaRoutes from "./modules/chamada/chamada.routes.js";
+import certificadoRoutes from "./modules/certificado/certificado.routes.js";
 
 const routes = Router();
 
@@ -58,4 +59,5 @@ routes.use("/dashboard", dashboardRoutes);
 routes.use("/aula", aulaRoutes);
 routes.use("/professor", professorRoutes);
 routes.use("/professor", chamadaRoutes);
+routes.use("/certificado", certificadoRoutes);
 export default routes;
