@@ -1,5 +1,5 @@
 
-import { isValidObjectId } from "mongoose";
+import { isValidObjectId, Types } from "mongoose";
 
 import Turma from "../turma/turma.model.js";
 import Curso from "../curso/curso.model.js";
@@ -8,6 +8,9 @@ import AulaTurma from "../turma/aula-turma.model.js";
 import Matricula from "../matricula/matricula.model.js";
 import Chamada from "../chamada/chamada.model.js";
 import User from "../user/user.model.js";
+
+import { randomBytes } from "node:crypto";
+import Certificado from "./certificado.model.js";
 
 import { StatusAula } from "../turma/turma.types.js";
 import { StatusMatricula } from "../matricula/matricula.types.js";
@@ -283,6 +286,155 @@ class CertificadoService {
             },
             alunos
         };
+    }
+
+
+    public async emitir(
+        matriculaId: string,
+        administradorId: string
+    ) {
+        if (
+            !isValidObjectId(matriculaId) ||
+            !isValidObjectId(administradorId)
+        ) {
+            throw new AppError(
+                "Identificador de matrícula ou administrador inválido.",
+                400
+            );
+        }
+
+        const existente = await Certificado.findOne({
+            matricula: matriculaId
+        });
+
+        if (existente) {
+            return {
+                certificado: existente,
+                criado: false
+            };
+        }
+
+        const matricula = await Matricula.findById(matriculaId)
+            .select("_id user turma status")
+            .lean();
+
+        if (!matricula) {
+            throw new AppError(
+                "Matrícula não encontrada.",
+                404
+            );
+        }
+
+        if (matricula.status !== StatusMatricula.APROVADA) {
+            throw new AppError(
+                "A matrícula não está aprovada.",
+                409
+            );
+        }
+
+        const turma = await Turma.findById(matricula.turma)
+            .select("curso dataInicio dataFim")
+            .lean();
+
+        if (!turma) {
+            throw new AppError(
+                "Turma não encontrada.",
+                404
+            );
+        }
+
+        const resultado = await this.consultarElegibilidade(
+            matricula.turma.toString()
+        );
+
+        const aluno = resultado.alunos.find(
+            (item) => item.matriculaId === matriculaId
+        );
+
+        if (
+            !aluno ||
+            !aluno.elegivel ||
+            aluno.frequenciaPercentual === null
+        ) {
+            throw new AppError(
+                "O aluno ainda não atende aos requisitos para emissão. Consulte a elegibilidade.",
+                409
+            );
+        }
+
+        if (resultado.resumo.cargaHorariaMinutos <= 0) {
+            throw new AppError(
+                "A carga horária do curso é inválida.",
+                409
+            );
+        }
+
+        const codigoVerificacao = randomBytes(16)
+            .toString("hex")
+            .toUpperCase();
+
+        try {
+            const certificado = await Certificado.create({
+                matricula: matricula._id,
+                aluno: matricula.user,
+                turma: matricula.turma,
+                curso: turma.curso as Types.ObjectId,
+
+                codigoVerificacao,
+
+                nomeAluno: aluno.nome,
+                nomeCurso: resultado.turma.curso,
+                turno: resultado.turma.turno,
+
+                periodoInicio: turma.dataInicio,
+                periodoFim: turma.dataFim,
+
+                cargaHorariaMinutos:
+                    resultado.resumo.cargaHorariaMinutos,
+
+                frequenciaPercentual:
+                    aluno.frequenciaPercentual,
+
+                presentes: aluno.presentes,
+                faltas: aluno.faltas,
+                aulasRealizadas:
+                    resultado.resumo.aulasRealizadas,
+
+                emitidoPor: administradorId,
+                emitidoEm: new Date()
+            });
+
+            return {
+                certificado,
+                criado: true
+            };
+
+        } catch (error) {
+            if (
+                error !== null &&
+                typeof error === "object" &&
+                "code" in error &&
+                error.code === 11000
+            ) {
+                const emitido = await Certificado.findOne({
+                    matricula: matriculaId
+                });
+
+                if (emitido) {
+                    return {
+                        certificado: emitido,
+                        criado: false
+                    };
+                }
+
+                throw new AppError(
+                    "Não foi possível reservar um código de certificado. Tente novamente.",
+                    409
+                );
+            }
+
+            throw error;
+        }
     }
 }
 

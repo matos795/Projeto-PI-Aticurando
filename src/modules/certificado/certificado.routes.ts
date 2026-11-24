@@ -18,4 +18,11 @@ certificadoRoutes.get(
     certificadoController.consultarElegibilidade
 );
 
+certificadoRoutes.post(
+    "/emitir/:matriculaId",
+    requireAuth,
+    authorizeRoles(Papel_usuario.ADM),
+    certificadoController.emitir
+);
+
 export default certificadoRoutes;
