@@ -24,6 +24,13 @@ class AulaTurmaService {
             throw new AppError("Ocorrência de aula não encontrada.", 404);
         }
 
+        if (ocorrencia.status === StatusAula.REALIZADA) {
+            throw new AppError(
+                "Uma aula realizada não pode ter seu agendamento alterado.",
+                409
+            );
+        }
+
         if (data.dataInicio || data.dataFim) {
             const turma = await Turma.findById(ocorrencia.turma)
 
@@ -65,6 +72,79 @@ class AulaTurmaService {
             }
         }
 
+        const statusFinal = data.status ?? ocorrencia.status;
+
+        if (statusFinal === StatusAula.AGENDADA) {
+            const inicioNovo = data.dataInicio
+                ? new Date(data.dataInicio)
+                : ocorrencia.dataInicio;
+
+            const fimNovo = data.dataFim
+                ? new Date(data.dataFim)
+                : ocorrencia.dataFim;
+
+            const professorId =
+                data.professor ?? ocorrencia.professor?.toString();
+
+            if (!inicioNovo || !fimNovo || !professorId) {
+                throw new AppError(
+                    "Informe início, término e professor para agendar a aula.",
+                    400
+                );
+            }
+
+            if (
+                Number.isNaN(inicioNovo.getTime()) ||
+                Number.isNaN(fimNovo.getTime()) ||
+                inicioNovo >= fimNovo
+            ) {
+                throw new AppError(
+                    "O horário de término deve ser posterior ao início.",
+                    400
+                );
+            }
+
+            const conflitoTurma = await AulaTurma.exists({
+                _id: { $ne: ocorrencia._id },
+                turma: ocorrencia.turma,
+                status: {
+                    $in: [
+                        StatusAula.AGENDADA,
+                        StatusAula.REALIZADA
+                    ]
+                },
+                dataInicio: { $lt: fimNovo },
+                dataFim: { $gt: inicioNovo }
+            });
+
+            if (conflitoTurma) {
+                throw new AppError(
+                    "Esta turma já possui outra aula no horário selecionado.",
+                    409
+                );
+            }
+
+            const conflitoProfessor = await AulaTurma.exists({
+                _id: { $ne: ocorrencia._id },
+                professor: professorId,
+                status: {
+                    $in: [
+                        StatusAula.AGENDADA,
+                        StatusAula.REALIZADA
+                    ]
+                },
+                dataInicio: { $lt: fimNovo },
+                dataFim: { $gt: inicioNovo }
+            });
+
+            if (conflitoProfessor) {
+                throw new AppError(
+                    "O professor já possui outra aula nesse horário.",
+                    409
+                );
+            }
+        }
+
         return await AulaTurma.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
@@ -72,7 +152,6 @@ class AulaTurmaService {
             .populate("aula")
             .populate("professor", "name email")
     }
-
 
     public async buscarProximaAulaAluno(alunoId: string) {
         if (!isValidObjectId(alunoId)) {
